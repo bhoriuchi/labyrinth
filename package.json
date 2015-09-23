@@ -1,0 +1,32 @@
+{
+  "name": "labyrinth",
+  "version": "0.1.0",
+  "description": "Orchestration engine",
+  "main": "lib/labyrinth.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bhoriuchi/labyrinth.git"
+  },
+  "keywords": [
+    "orchestration",
+    "workflow"
+  ],
+  "author": "Branden Horiuchi <bhoriuchi@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/bhoriuchi/labyrinth",
+  "devDependencies": {
+    "mysql": "^2.8.0"
+  },
+  "bugs": {
+    "url": "https://github.com/bhoriuchi/labyrinth/issues"
+  },
+  "dependencies": {
+    "dreamcatcher": "git+https://github.com/bhoriuchi/dreamcatcher.git#master"
+  },
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "directories": {
+    "example": "example"
+  }
+}
