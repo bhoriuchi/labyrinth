@@ -21,7 +21,6 @@
     "url": "https://github.com/bhoriuchi/labyrinth/issues"
   },
   "dependencies": {
-    "bookshelf-factory": "git+https://github.com/bhoriuchi/bookshelf-factory.git#master",
     "dreamcatcher": "git+https://github.com/bhoriuchi/dreamcatcher.git#master",
     "jsplumb": "^1.7.9"
   },

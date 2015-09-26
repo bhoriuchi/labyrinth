@@ -20,12 +20,11 @@ var config = {
 };
 
 
-var installer = require('../lib/core/setup/install')(config);
 var labyrinth = require('../lib/labyrinth')(config);
 var _         = labyrinth.dream.mods.lodash;
 
 
-installer.then(function() {
+labyrinth.setup.install().then(function() {
 	//console.log('Created routes', _.uniq(_.pluck(labyrinth.routes, 'route.path')));
 	
 	labyrinth.run(labyrinth.routes);
