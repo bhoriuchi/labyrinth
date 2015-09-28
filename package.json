@@ -1,7 +1,7 @@
 {
   "name": "labyrinth",
   "version": "0.1.0",
-  "description": "Orchestration engine",
+  "description": "A Workflow plug-in for dreamcatcher",
   "main": "lib/labyrinth.js",
   "repository": {
     "type": "git",
@@ -9,7 +9,8 @@
   },
   "keywords": [
     "orchestration",
-    "workflow"
+    "workflow",
+    "dreamcatcher"
   ],
   "author": "Branden Horiuchi <bhoriuchi@gmail.com>",
   "license": "MIT",
@@ -21,9 +22,7 @@
     "url": "https://github.com/bhoriuchi/labyrinth/issues"
   },
   "dependencies": {
-    "dreamcatcher": "git+https://github.com/bhoriuchi/dreamcatcher.git#master",
-    "jailed": "^0.2.0",
-    "jsplumb": "^1.7.9"
+    "dreamcatcher": "git+https://github.com/bhoriuchi/dreamcatcher.git#master"
   },
   "scripts": {
     "test": "echo \\\"Error: no test specified\\\" && exit 1"
