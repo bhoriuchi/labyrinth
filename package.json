@@ -22,7 +22,9 @@
     "url": "https://github.com/bhoriuchi/labyrinth/issues"
   },
   "dependencies": {
-    "dreamcatcher": "git+https://github.com/bhoriuchi/dreamcatcher.git#master"
+    "dreamcatcher": "git+https://github.com/bhoriuchi/dreamcatcher.git#master",
+    "sbx": "git+https://github.com/bhoriuchi/sbx.git#master",
+    "lodash": "^3.10.1"
   },
   "scripts": {
     "test": "echo \\\"Error: no test specified\\\" && exit 1"

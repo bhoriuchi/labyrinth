@@ -28,9 +28,7 @@ var dream     = require('dreamcatcher')(config);
 var labyrinth = dream.register.plugin('labyrinth', require('../lib/labyrinth'));
 var _         = dream.mods.lodash;
 
-labyrinth.context.set({
-	console: console
-});
+labyrinth.modules.set(['console', 'lodash']);
 
 
 labyrinth.setup.install().then(function() {
