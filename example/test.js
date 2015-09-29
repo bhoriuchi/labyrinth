@@ -2,27 +2,28 @@
 
 // create a database connection config
 var config = {
-	"client": "mysql",
-	"connection": {
-		"host": "127.0.0.1",
-		"user": "db",
-		"password": "password",
-		"database": "test",
-		"charset": "utf8"
+	database: {
+		client: "mysql",
+		connection: {
+			host: "127.0.0.1",
+			user: "db",
+			password: "password",
+			database: "test",
+			charset: "utf8"
+		},
+		debug: false
 	},
-	debug: false,
 	rest: {
 		basePath: '/api',
 		versions: ['0.0.1'],
 		port: 8080,
 		cors: {},
 		server: {
-			name: '-> labyrinth <-'
+			name: '[ LABYRINTH ]'
 		}
 	}
 };
 
-console.log(__dirname);
 
 var dream     = require('dreamcatcher')(config);
 var labyrinth = dream.register.plugin('labyrinth', require('../lib/labyrinth'));
