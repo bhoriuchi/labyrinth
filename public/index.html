@@ -1,0 +1,132 @@
+<!doctype html>
+<head>
+<title>Workflow</title>
+
+    <style>
+        #diagramContainer {
+            padding: 20px;
+            width:80%; height: 200px;
+            border: 1px solid gray;
+        }
+        
+        .initial {
+            border: 1px solid black;
+            width: 100px;
+            height: 100px;
+            position: relative;
+            float: left;
+        }
+        
+        .item {
+            width: 100px;
+            height: 100px;
+            border: 1px solid black;
+            position: absolute;
+        }
+        
+        
+    </style>
+
+</head>
+
+<body>
+
+    <h1 id="workflowName"></h1>
+    <div id="diagramContainer">
+    </div>
+
+
+    <script src="/public/js/jsplumb/external/jquery-1.9.0-min.js"></script>
+    <script src="/public/js/jsplumb/external/jquery-ui-1.9.2.min.js"></script>
+    <script src="/public/js/jsplumb/js/jsPlumb-1.7.9-min.js"></script>
+
+    <script>
+    
+    
+    $.ajax({
+    	url: 'http://localhost:8080/api/wf/workflows/workflow-log',
+    	method: 'GET',
+    	crossDomain: true,
+    	headers: {Accept: 'application/json'}
+    })
+    .done(function(data, status, xhr) {
+    	console.log(data);
+
+    	
+    	// jsplumb everything
+    	jsPlumb.ready(function() {
+    		
+    	      var start, end;
+    	        
+    	      var common = {
+    	    		    connector: ["Straight"],
+    	    		    anchor: ["Left", "Right"],
+    	    		    endpoint:"Dot"
+    	    };
+    	      
+    	        // set the title
+    	        $('#workflowName').html(data.name);
+    	        
+    	        // create the step divs and get the start/end ids
+    	        $.each(data.steps, function(index, step) {
+    	            
+    	            // get the start and end
+    	            start = (step.activity.id === 'activity-start') ? step.id : start;
+    	            end   = (step.activity.id === 'activity-end')   ? step.id : end;
+    	            
+    	            // add the divs
+    	            $('#diagramContainer').append('<div id="' + step.id + '" class="initial">' + step.label + '</div>');
+    	        });
+
+    	    
+    	        $(".initial").each(function(i) {
+    	        	
+    	            var left = $(this).offset().left;
+    	            var top = $(this).offset().top;
+    	            
+                    $(this).css({
+                        left: left,
+                        top: top
+                    });
+    	        });
+    	        
+                $(".initial").each(function(i) {
+                    
+                    $(this).removeClass('initial').addClass('item');
+                });
+
+                
+                
+    	        // plumb everything
+    	        $.each(data.steps, function(index, step) {
+    	        	
+    	        	var success = step.success   ? step.success   : end;
+    	        	var fail    = step.fail      ? step.fail      : end;
+    	        	var except  = step.exception ? step.exception : end;
+    	        	
+                    jsPlumb.connect({
+                        source: step.id,
+                        target: success,
+                        overlays:[ ["Arrow" , { width:12, length:12, location:0.67 }] ]
+                    }, common);
+                    jsPlumb.draggable(step.id);
+    	        });
+    	        
+    	        
+
+    		
+    	});
+    })
+    .fail(function(xhr, status, err) {
+    	console.log('ERROR', err);
+    });
+    
+
+    
+    </script> 
+
+
+
+</body>
+
+</html>

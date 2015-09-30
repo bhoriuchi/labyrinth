@@ -35,6 +35,14 @@ labyrinth.modules.set(['console', 'lodash']);
 labyrinth.setup.install().then(function() {
 	//console.log('Created routes', _.uniq(_.pluck(labyrinth.routes, 'route.path')));
 	var routes = dream.getRoutes();
+	
+	// push a route to the basic UI
+	routes.push(dream.staticRoute({
+		path: /\/public\/?.*/,
+		directory: __dirname.replace('/example', ''),
+		'default': 'index.html'
+	}));
+	
 	dream.run(routes);
 	
 });
