@@ -5,8 +5,9 @@
     <style>
         #diagramContainer {
             padding: 20px;
-            width:80%; height: 200px;
+            width:95%; height: 600px;
             border: 1px solid gray;
+            position: absolute;
         }
         
         .initial {
@@ -31,16 +32,88 @@
 
 <body>
 
-    <h1 id="workflowName"></h1>
-    <div id="diagramContainer">
-    </div>
+    <h1 id="workflowName" style="font-family:Verdana"></h1>
+    <div id="diagramContainer"></div>
 
 
     <script src="/public/js/jsplumb/external/jquery-1.9.0-min.js"></script>
     <script src="/public/js/jsplumb/external/jquery-ui-1.9.2.min.js"></script>
+    <script src="/public/js/jsplumb/js/biltong-0.2.js"></script>
+    <script src="/public/js/jsplumb/js/farahey-0.5.js"></script>
     <script src="/public/js/jsplumb/js/jsPlumb-1.7.9-min.js"></script>
 
     <script>
+    
+    /* Start - http://morrisonpitt.com/farahey/ */
+    var _offset = function(id) {
+        var el = $("#" + id)[0],
+            _ = function(p) {
+                var v = el.style[p];
+                return parseInt(v.substring(0, v.length - 2));
+            };
+        return {
+            left:_("left"),
+            top:_("top")
+        };
+    };
+
+    var _setOffset = function(id, o) {
+        var el = $("#" + id)[0];
+        el.style.left = o.left + "px";
+        el.style.top = o.top + "px";
+    };
+    
+
+    
+    /* End - http://morrisonpitt.com/farahey/ */
+    
+    var gridConstrain = function(container) {
+        
+        var position = container.position();
+        var top    = position.top;
+        var left   = position.left;
+        var bottom = top + container.height();
+        var right  = position.left + container.width();
+
+        
+        return function(id, current, delta) {
+
+            var node    = $('#' + id);
+            var pos     = node.position();
+            var width   = node.width();
+            var height  = node.height();
+            var nBottom = pos.top + height;
+            var nRight  = pos.left + width;
+            
+            var newLeft = current[0] + left;
+            var newTop  = current[1] + top;
+            
+            if (newLeft <= left) {
+                newLeft = left;
+            }
+            else if (nRight >= right) {
+                newLeft = delta.left - width;
+            }
+            else {
+                newLeft = delta.left;
+            }
+            
+            if (newTop <= top) {
+                newTop = top;
+            }
+            else if (nBottom >= (bottom - (height / 2))) {
+                newTop = delta.top - height;
+            }
+            else {
+                newTop = delta.top;
+            }
+            
+            return {
+                left:newLeft,
+                top:newTop
+            };
+        };
+    };
     
     
     $.ajax({
@@ -59,43 +132,46 @@
     	      var start, end;
     	        
     	      var common = {
-    	    		    connector: ["Straight"],
+    	    		    connector: ["Flowchart"],
     	    		    anchor: ["Left", "Right"],
     	    		    endpoint:"Dot"
     	    };
-    	      
+              var elements = [];
     	        // set the title
     	        $('#workflowName').html(data.name);
     	        
+    	        var lastElement, my, at;
+    	        
     	        // create the step divs and get the start/end ids
     	        $.each(data.steps, function(index, step) {
-    	            
-    	            // get the start and end
-    	            start = (step.activity.id === 'activity-start') ? step.id : start;
-    	            end   = (step.activity.id === 'activity-end')   ? step.id : end;
+    	           
+    	        	if (!lastElement) {
+    	        		lastElement = $('#diagramContainer');
+    	        		my = 'left top';
+    	        		at = 'left+10 top+10';
+    	        	}
+    	        	else {
+                        my = 'left top';
+                        at = 'right+100 top';
+    	        	}
     	            
     	            // add the divs
-    	            $('#diagramContainer').append('<div id="' + step.id + '" class="initial">' + step.label + '</div>');
-    	        });
-
-    	    
-    	        $(".initial").each(function(i) {
-    	        	
-    	            var left = $(this).offset().left;
-    	            var top = $(this).offset().top;
+    	            $('#diagramContainer').append('<div id="' + step.id + '" class="item">' + step.label + '</div>');
+    	            $('#' + step.id)
+    	            .position({
+    	            	my: my,
+    	            	at: at,
+    	            	of: lastElement,
+    	            	within: $('#diagramContainer'),
+    	            	colission: 'fit'
+    	            });
     	            
-                    $(this).css({
-                        left: left,
-                        top: top
-                    });
+    	            lastElement = $('#' + step.id);
+    	            
+    	            elements.push(step.id);
     	        });
-    	        
-                $(".initial").each(function(i) {
-                    
-                    $(this).removeClass('initial').addClass('item');
-                });
 
-                
+
                 
     	        // plumb everything
     	        $.each(data.steps, function(index, step) {
@@ -104,16 +180,54 @@
     	        	var fail    = step.fail      ? step.fail      : end;
     	        	var except  = step.exception ? step.exception : end;
     	        	
-                    jsPlumb.connect({
-                        source: step.id,
-                        target: success,
-                        overlays:[ ["Arrow" , { width:12, length:12, location:0.67 }] ]
-                    }, common);
-                    jsPlumb.draggable(step.id);
+    	        	if (success !== step.id) {
+                        jsPlumb.connect({
+                            source: step.id,
+                            target: success,
+                            overlays:[ ["Arrow" , { width:12, length:12, location:0.67 }] ]
+                        }, common);
+    	        	}
     	        });
     	        
-    	        
+                
+                var _dragElement = null,
+                _dragFilter = function(id) {
+                    return id != _dragElement;
+                };
 
+            var m8 = new Magnetizer({
+                container:$("#diagramContainer"),
+                getContainerPosition:function(c) { return c.offset(); },
+                getPosition:_offset,
+                getSize:function(id) { return [ $("#" + id).outerWidth(), $("#" + id).outerHeight() ]; },
+                getId : function(id) { return id; },
+                setPosition:_setOffset,
+                elements:elements,
+                filter:_dragFilter,
+                padding:[5,5],
+                constrain:gridConstrain($('#diagramContainer'))
+            });
+    	        
+            // run it to start with
+            m8.executeAtCenter();
+            jsPlumb.repaintEverything();
+
+            jsPlumb.draggable(elements, {
+                start:function(p) {
+                    _dragElement = p.el.getAttribute("id");
+                },
+                drag:function(p) {
+                    m8.executeAtEvent(p.e);
+                    // here it might be the case that farahey should fire individual move events, because with lots of nodes
+                    // maybe repainting everything is wasteful.
+                    jsPlumb.repaintEverything();
+                },
+                stop:function(p) {
+                    _dragElement = null;
+                },
+                containment: true,
+                grid: [20, 20]
+            });
     		
     	});
     })
