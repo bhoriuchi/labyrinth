@@ -1,29 +1,75 @@
 <!doctype html>
+<html>
 <head>
 <title>Workflow</title>
 
     <style>
+    
+    	div.connectable {
+    		width: 106px;
+    		height: 106px;
+    		position: absolute;
+    	}
+    	
+    	div.item {
+    	    width: 100px;
+    		height: 100px;
+    		position: relative;
+    		display: table;
+    		border: 3px solid #404749;
+    		box-shadow: 2px 2px 2px #888888;
+    	}
+    
+    	div.startItem {
+    		background: #BDECB6;
+    		border-radius: 50%;
+
+    	}
+    	
+    	div.endItem {
+    		background: #FF7878;
+    		border-radius: 50%;
+    	}
+    	
+    	div.taskItem {
+    		text-overflow: ellipsis;
+    		background: #B5D8EB;
+    	}
+    
+
+    	div.item p {
+    		font-family: Arial;
+    		color: #404749;
+    		display: table-cell;
+    		vertical-align: middle;
+    		text-align: center;
+    		position: relative;
+    	}
+    	
+    	div.taskItem p {
+    		font-size: 9pt;
+    	}
+    	
+    	div.startItem, div.endItem p {
+    		font-weight: bold;
+    	}
+    
         #diagramContainer {
-            padding: 20px;
-            width:95%; height: 600px;
-            border: 1px solid gray;
+            padding: 0px;
+            width: 10000px;
+            height: 10000px;
             position: absolute;
+            background-color: #FCFCFC;
+            border: 1px solid blue;
         }
         
-        .initial {
-            border: 1px solid black;
-            width: 100px;
-            height: 100px;
-            position: relative;
-            float: left;
+        #canvas {
+        	padding: 0px;
+        	width: 100%;
+        	height: 600px;
+        	border: 1px solid gray;
         }
         
-        .item {
-            width: 100px;
-            height: 100px;
-            border: 1px solid black;
-            position: absolute;
-        }
         
         
     </style>
@@ -33,14 +79,18 @@
 <body>
 
     <h1 id="workflowName" style="font-family:Verdana"></h1>
+    <div id="canvas">
     <div id="diagramContainer"></div>
+    </div>
+    
 
 
-    <script src="/public/js/jsplumb/external/jquery-1.9.0-min.js"></script>
-    <script src="/public/js/jsplumb/external/jquery-ui-1.9.2.min.js"></script>
-    <script src="/public/js/jsplumb/js/biltong-0.2.js"></script>
-    <script src="/public/js/jsplumb/js/farahey-0.5.js"></script>
-    <script src="/public/js/jsplumb/js/jsPlumb-1.7.9-min.js"></script>
+    <script src="/public/js/external/jquery-1.11.3.min.js"></script>
+    <script src="/public/js/external/jquery-ui-1.11.4.min.js"></script>
+    <script src="/public/js/external/biltong-0.2.js"></script>
+    <script src="/public/js/external/farahey-0.5.js"></script>
+    <script src="/public/js/external/jsPlumb-1.7.9-min.js"></script>
+    <script src="/public/js/external/jquery.panzoom-2.0.5.js"></script>
 
     <script>
     
@@ -67,54 +117,15 @@
     
     /* End - http://morrisonpitt.com/farahey/ */
     
-    var gridConstrain = function(container) {
-        
-        var position = container.position();
-        var top    = position.top;
-        var left   = position.left;
-        var bottom = top + container.height();
-        var right  = position.left + container.width();
-
-        
-        return function(id, current, delta) {
-
-            var node    = $('#' + id);
-            var pos     = node.position();
-            var width   = node.width();
-            var height  = node.height();
-            var nBottom = pos.top + height;
-            var nRight  = pos.left + width;
-            
-            var newLeft = current[0] + left;
-            var newTop  = current[1] + top;
-            
-            if (newLeft <= left) {
-                newLeft = left;
-            }
-            else if (nRight >= right) {
-                newLeft = delta.left - width;
-            }
-            else {
-                newLeft = delta.left;
-            }
-            
-            if (newTop <= top) {
-                newTop = top;
-            }
-            else if (nBottom >= (bottom - (height / 2))) {
-                newTop = delta.top - height;
-            }
-            else {
-                newTop = delta.top;
-            }
-            
+    var gridFree = function(container) {
+    	return function(id, current, delta) {
+    		
             return {
-                left:newLeft,
-                top:newTop
+                left:delta.left,
+                top:delta.top
             };
-        };
+    	};
     };
-    
     
     $.ajax({
     	url: 'http://localhost:8080/api/wf/workflows/workflow-log',
@@ -125,50 +136,84 @@
     .done(function(data, status, xhr) {
     	console.log(data);
 
+    	$('#diagramContainer').position({
+    		my: 'center',
+    		at: 'center',
+    		of: $('#canvas')
+    	});
+		
     	
     	// jsplumb everything
     	jsPlumb.ready(function() {
     		
+
     	      var start, end;
     	        
     	      var common = {
     	    		    connector: ["Flowchart"],
     	    		    anchor: ["Left", "Right"],
-    	    		    endpoint:"Dot"
+    	    		    endpoint: ["Dot", {radius: 5}]
     	    };
+    	      
+    	      var common2 = {
+  	    		    connector: ["Flowchart"],
+	    		    anchor: ["Top", "Bottom"],
+	    		    endpoint: ["Dot", {radius: 5}]  
+    	      };
+    	      
               var elements = [];
     	        // set the title
     	        $('#workflowName').html(data.name);
     	        
-    	        var lastElement, my, at;
+    	        var prevElement, my, at;
     	        
     	        // create the step divs and get the start/end ids
     	        $.each(data.steps, function(index, step) {
     	           
-    	        	if (!lastElement) {
-    	        		lastElement = $('#diagramContainer');
-    	        		my = 'left top';
-    	        		at = 'left+10 top+10';
+    	        	if (!prevElement) {
+    	        		
+    	        		var cw = $('#canvas').width();
+    	        		
+    	        		prevElement = $('#diagramContainer');
+    	        		my = 'left-' + (cw/2) + ' center-230';
+    	        		at = 'center';
     	        	}
     	        	else {
-                        my = 'left top';
-                        at = 'right+100 top';
+                        my = 'center';
+                        at = 'right+150';
     	        	}
     	            
+    	        	var itemClass;
+    	        	
+    	        	if (step.activity.type === 'start') {
+    	        		itemClass = 'item startItem';
+    	        	}
+    	        	else if (step.activity.type === 'end') {
+    	        		itemClass = 'item endItem';
+    	        	}
+    	        	else if (step.activity.type === 'task') {
+    	        		itemClass = 'item taskItem';
+    	        	}
+    	        	else {
+    	        		itemClass = 'item';
+    	        	}
+    	        	
     	            // add the divs
-    	            $('#diagramContainer').append('<div id="' + step.id + '" class="item">' + step.label + '</div>');
+    	            $('#diagramContainer').append('<div id="' + step.id + '" class="connectable"><div class="' + itemClass + '"><p>' + step.label + '</p></div></div>');
     	            $('#' + step.id)
     	            .position({
     	            	my: my,
     	            	at: at,
-    	            	of: lastElement,
-    	            	within: $('#diagramContainer'),
-    	            	colission: 'fit'
+    	            	of: prevElement,
+    	            	//within: $('#diagramContainer'),
+    	            	//colission: 'fit'
     	            });
     	            
-    	            lastElement = $('#' + step.id);
+    	            prevElement = $('#' + step.id);
     	            
     	            elements.push(step.id);
+    	            
+    	            
     	        });
 
 
@@ -181,12 +226,24 @@
     	        	var except  = step.exception ? step.exception : end;
     	        	
     	        	if (success !== step.id) {
+
                         jsPlumb.connect({
                             source: step.id,
                             target: success,
+                            anchor: "Right",
                             overlays:[ ["Arrow" , { width:12, length:12, location:0.67 }] ]
                         }, common);
     	        	}
+    	        	
+    	        	if (fail) {
+                        jsPlumb.connect({
+                            source: step.id,
+                            target: fail,
+                            anchor: "Bottom",
+                            overlays:[ ["Arrow" , { width:12, length:12, location:0.67 }] ]
+                        }, common);
+    	        	}
+    	        	
     	        });
     	        
                 
@@ -205,13 +262,14 @@
                 elements:elements,
                 filter:_dragFilter,
                 padding:[5,5],
-                constrain:gridConstrain($('#diagramContainer'))
+                constrain:gridFree($('#diagramContainer'))
             });
     	        
             // run it to start with
-            m8.executeAtCenter();
+            //m8.executeAtCenter();
             jsPlumb.repaintEverything();
 
+            
             jsPlumb.draggable(elements, {
                 start:function(p) {
                     _dragElement = p.el.getAttribute("id");
@@ -224,19 +282,42 @@
                 },
                 stop:function(p) {
                     _dragElement = null;
-                },
-                containment: true,
-                grid: [20, 20]
+                }
             });
+            
     		
     	});
+        $panzoom = $('#diagramContainer').panzoom();
+
+        $panzoom.parent().on('mousewheel.focal', function( e ) {
+        	
+        	if (event.shiftKey) {
+                e.preventDefault();
+                var delta = e.delta || e.originalEvent.wheelDelta;
+                var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
+                var dc = document.getElementById('diagramContainer');
+                var offsetX  = Math.abs(dc.offsetLeft) + e.clientX;
+                var offsetY  = Math.abs(dc.offsetTop) + e.clientY;
+                
+                var focal = {
+                	clientX: offsetX,
+                	clientY: offsetY
+                };
+               
+                $panzoom.panzoom('zoom', zoomOut, {
+                  increment: 0.1,
+                  animate: false,
+                  silent: true,
+                  focal: focal
+                });
+        	}
+        });
+
     })
     .fail(function(xhr, status, err) {
     	console.log('ERROR', err);
     });
-    
-
-    
+   
     </script> 
 
 

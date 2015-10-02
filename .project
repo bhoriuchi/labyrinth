@@ -16,15 +16,4 @@
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 		<nature>tern.eclipse.ide.core.ternnature</nature>
 	</natures>
-	<filteredResources>
-		<filter>
-			<id>1443717056639</id>
-			<name>public</name>
-			<type>21</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-public</arguments>
-			</matcher>
-		</filter>
-	</filteredResources>
 </projectDescription>
