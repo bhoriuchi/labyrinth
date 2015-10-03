@@ -1,21 +1,32 @@
-div.connectable {
+
+div.item-sm {
+	width: 35px;
+	height: 35px;
+}
+
+div.item-md {
 	width: 75px;
 	height: 75px;
+}
+
+div.item-lg {
+	width: 100px;
+	height: 100px;
+}
+
+div.connectable {
 	position: absolute;
 	border: 0px;
 	overflow: visible;
 }
 
 div.item {
-	width: 75px;
-	height: 75px;
 	position: relative;
 	display: table;
 }
 
 div.itemLabel {
 	position: relative;
-	left: -38px;
 	font-family: Arial;
 	font-size: 10px;
 	text-align: center;
@@ -76,18 +87,18 @@ div.startItem, div.endItem p {
 	font-weight: bold;
 }
 
-#container {
+#wf-workarea {
 	padding: 0px;
 	width: 10000px;
 	height: 10000px;
 	position: absolute;
-	background-color: #FCFCFC;
-	border: 1px solid blue;
+	background-color: #fcfcfc;
 }
 
-#canvas {
+#wf-viewport {
 	padding: 0px;
 	width: 100%;
 	height: 600px;
-	border: 1px solid gray;
+	border: 1px solid #cccccc;
+	border-radius: 2px;
 }

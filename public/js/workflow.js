@@ -34,8 +34,17 @@ var _setOffset = function(id, o) {
 
 
 // add the nodes to the canvas container
-var _addNodes = function(canvas, container, header, data) {
-
+var _addNodes = function(canvas, container, header, data, size) {
+	
+	var sizeClass = 'item-md';
+	
+	if (size === 'small') {
+		sizeClass = 'item-sm';
+	}
+	else if (size === 'large') {
+		sizeClass = 'item-lg';
+	}
+	
 	// set the title
 	$('#' + header).html(data.name);
 
@@ -53,9 +62,10 @@ var _addNodes = function(canvas, container, header, data) {
 		if (!prevElement) {
 
 			var cw = $('#' + canvas).width();
+			var ch = $('#' + canvas).height();
 
 			prevElement = $('#' + container);
-			my = 'left-' + (cw / 2) + ' center-230';
+			my = 'left-' + (cw * 0.8) + ' top-' + (ch * 0.7);
 			at = 'center';
 		} else {
 			my = 'center';
@@ -65,37 +75,42 @@ var _addNodes = function(canvas, container, header, data) {
 		var itemClass;
 
 		if (step.activity.type === 'start') {
-			itemClass = 'item startItem';
+			itemClass = sizeClass + ' item startItem';
 		}
 		else if (step.activity.type === 'end') {
-			itemClass = 'item endItem';
+			itemClass = sizeClass + ' item endItem';
 			end = step.id;
 		}
 		else if (step.activity.type === 'task') {
-			itemClass = 'item taskItem';
+			itemClass = sizeClass + ' item taskItem';
 		}
 		else if (step.activity.type === 'condition') {
-			itemClass = 'item conditionItem';
+			itemClass = sizeClass + ' item conditionItem';
 		}
 		else if (step.activity.type === 'loop') {
-			itemClass = 'item loopItem';
+			itemClass = sizeClass + ' item loopItem';
 		}
 		else if (step.activity.type === 'workflow') {
-			itemClass = 'item workflowItem';
+			itemClass = sizeClass + ' item workflowItem';
 		}
 		else {
-			itemClass = 'item';
+			itemClass = sizeClass + ' item';
 		}
 
 		// add the divs
 		$('#' + container).append(
-				'<div id="' + step.id + '" class="connectable"><div class="'
-						+ itemClass + '"></div><div class="itemLabel">'
+				'<div id="' + step.id + '" class="' + sizeClass + ' connectable"><div class="'
+						+ itemClass + '"></div><div id="itemlabel-' + step.id + '" class="itemLabel">'
 						+ step.label + '</div></div>');
 		$('#' + step.id).position({
 			my : my,
 			at : at,
 			of : prevElement
+		});
+		$('#itemlabel-' + step.id).position({
+			my : 'top',
+			at : 'bottom',
+			of : $('#' + step.id)
 		});
 
 		prevElement = $('#' + step.id);

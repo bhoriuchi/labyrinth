@@ -3,6 +3,9 @@
 <head>
 	<title>Workflow Designer</title>
 	
+	<link rel="stylesheet" href="public/css/bootstrap.min.css">
+	<link rel="stylesheet" href="public/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="public/css/main.css">
 	<link rel="stylesheet" type="text/css" href="css/workflow.css">
 	<link rel="stylesheet" type="text/css" href="css/jquery-ui-custom/jquery-ui.min.css">
 	<script src="js/vendor/jquery-1.11.2.min.js"></script>
@@ -23,22 +26,16 @@
 
 <body>
 
-	<div id="tabs" style="height:800px;">
-		<ul>
-			<li><a href="#tabs-1">Workflow</a></li>
-			<li><a href="#tabs-2">Other</a></li>
-		</ul>
-	
-		<div id="tabs-1" style="height:800px;">
-			<p id="header" style="font-family:Verdana"></p>
-			<div id="canvas">
-				<div id="container"></div>
+	<div class="jumbotron">
+		<div class="container">
+			<p id="wf-header" style="font-family:Verdana"></p>
+			<div id="wf-viewport">
+				<div id="wf-workarea"></div>
 			</div>
 		</div>
-		<div id="tabs-2">
-			Tabs 2
-		</div>
 	</div>
+
+
 
 
 
@@ -56,9 +53,8 @@
 	
 	    	// jsplumb everything
 	    	jsPlumb.ready(function() {
-	    		$('#tabs').tabs();
-	    		_addNodes('canvas', 'container', 'header', data);
-	    		_initCanvas('container');
+	    		_addNodes('wf-viewport', 'wf-workarea', 'wf-header', data);
+	    		_initCanvas('wf-workarea');
 	    		jsPlumb.repaintEverything();
 
 	    	});
