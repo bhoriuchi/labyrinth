@@ -198,22 +198,34 @@ var _initCanvas = function(container) {
 		}
 	});
 
+	
+	// set up panzoom with firefox compatibility
 	$panzoom = $('#' + container).panzoom();
-	$panzoom.parent().on('mousewheel.focal', function(e) {
+	$panzoom.parent().on('mousewheel.focal DOMMouseScroll', function(e) {
 
-		if (event.shiftKey) {
+		// require the shift key to scroll so that normal page scroll can take place
+		if (e.shiftKey) {
+			
+			// calculate the offset
 			e.preventDefault();
-			var delta = e.delta || e.originalEvent.wheelDelta;
+			
+			// for firefox set the wheel delta to negative
+			var ffWheel = e.originalEvent.detail * -1;
+			
+			// determine teh delta
+			var delta = e.delta || e.originalEvent.wheelDelta || ffWheel;
 			var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
 			var dc = document.getElementById(container);
-			var offsetX = Math.abs(dc.offsetLeft) + e.clientX;
-			var offsetY = Math.abs(dc.offsetTop) + e.clientY;
+			var offsetX = Math.abs(dc.offsetLeft) + e.originalEvent.clientX;
+			var offsetY = Math.abs(dc.offsetTop) + e.originalEvent.clientY;
 
+			// set the focal point
 			var focal = {
 				clientX : offsetX,
 				clientY : offsetY
 			};
 
+			// zoom in on the focal point
 			$panzoom.panzoom('zoom', zoomOut, {
 				increment : 0.1,
 				animate : false,

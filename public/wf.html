@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+	<title>Workflow Designer</title>
+	
+	<link rel="stylesheet" type="text/css" href="css/workflow.css">
+	<link rel="stylesheet" type="text/css" href="css/jquery-ui-custom/jquery-ui.min.css">
+	<script src="js/vendor/jquery-1.11.2.min.js"></script>
+    <script src="js/vendor/jquery-ui-1.11.4.min.js"></script>
+    <script src="js/vendor/biltong-0.2.js"></script>
+    <script src="js/vendor/farahey-0.5.js"></script>
+    <script src="js/vendor/jsPlumb-1.7.9-min.js"></script>
+    <script src="js/vendor/jquery.panzoom-2.0.5.js"></script>
+	<script src="js/workflow.js"></script>
+	
+	<style>
+		.ui-widget * {
+			outline: none;
+		}​
+	</style>
+	
+</head>
+
+<body>
+
+	<div id="tabs" style="height:800px;">
+		<ul>
+			<li><a href="#tabs-1">Workflow</a></li>
+			<li><a href="#tabs-2">Other</a></li>
+		</ul>
+	
+		<div id="tabs-1" style="height:800px;">
+			<p id="header" style="font-family:Verdana"></p>
+			<div id="canvas">
+				<div id="container"></div>
+			</div>
+		</div>
+		<div id="tabs-2">
+			Tabs 2
+		</div>
+	</div>
+
+
+
+
+    <script>
+
+	    $.ajax({
+	    	url: 'http://localhost:8080/api/wf/workflows/workflow-log',
+	    	method: 'GET',
+	    	crossDomain: true,
+	    	headers: {Accept: 'application/json'}
+	    })
+	    .done(function(data, status, xhr) {
+	    	console.log(data);
+	
+	    	// jsplumb everything
+	    	jsPlumb.ready(function() {
+	    		$('#tabs').tabs();
+	    		_addNodes('canvas', 'container', 'header', data);
+	    		_initCanvas('container');
+	    		jsPlumb.repaintEverything();
+
+	    	});
+	    })
+	    .fail(function(xhr, status, err) {
+	    	console.log('ERROR', err);
+	    });
+   
+    </script> 
+
+</body>
+</html>

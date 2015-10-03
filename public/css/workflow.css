@@ -30,32 +30,32 @@ div.itemLabel {
 }
 
 div.startItem {
-	background: url(/public/assets/images/start.svg);
+	background: url(../img/start.svg);
 	background-size: cover;
 }
 
 div.endItem {
-	background: url(/public/assets/images/end.svg);
+	background: url(../img/end.svg);
 	background-size: cover;
 }
 
 div.taskItem {
-	background: url(/public/assets/images/task.svg);
+	background: url(../img/task.svg);
 	background-size: cover;
 }
 
 div.conditionItem {
-	background: url(/public/assets/images/condition.svg);
+	background: url(../img/condition.svg);
 	background-size: cover;
 }
 
 div.loopItem {
-	background: url(/public/assets/images/loop.svg);
+	background: url(../img/loop.svg);
 	background-size: cover;
 }
 
 div.workflowItem {
-	background: url(/public/assets/images/workflow.svg);
+	background: url(../img/workflow.svg);
 	background-size: cover;
 }
 
