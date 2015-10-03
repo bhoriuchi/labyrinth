@@ -1,327 +1,48 @@
 <!doctype html>
 <html>
 <head>
-<title>Workflow</title>
-
-    <style>
-    
-    	div.connectable {
-    		width: 106px;
-    		height: 106px;
-    		position: absolute;
-    	}
-    	
-    	div.item {
-    	    width: 100px;
-    		height: 100px;
-    		position: relative;
-    		display: table;
-    		border: 3px solid #404749;
-    		box-shadow: 2px 2px 2px #888888;
-    	}
-    
-    	div.startItem {
-    		background: #BDECB6;
-    		border-radius: 50%;
-
-    	}
-    	
-    	div.endItem {
-    		background: #FF7878;
-    		border-radius: 50%;
-    	}
-    	
-    	div.taskItem {
-    		text-overflow: ellipsis;
-    		background: #B5D8EB;
-    	}
-    
-
-    	div.item p {
-    		font-family: Arial;
-    		color: #404749;
-    		display: table-cell;
-    		vertical-align: middle;
-    		text-align: center;
-    		position: relative;
-    	}
-    	
-    	div.taskItem p {
-    		font-size: 9pt;
-    	}
-    	
-    	div.startItem, div.endItem p {
-    		font-weight: bold;
-    	}
-    
-        #diagramContainer {
-            padding: 0px;
-            width: 10000px;
-            height: 10000px;
-            position: absolute;
-            background-color: #FCFCFC;
-            border: 1px solid blue;
-        }
-        
-        #canvas {
-        	padding: 0px;
-        	width: 100%;
-        	height: 600px;
-        	border: 1px solid gray;
-        }
-        
-        
-        
-    </style>
-
-</head>
-
-<body>
-
-    <h1 id="workflowName" style="font-family:Verdana"></h1>
-    <div id="canvas">
-    <div id="diagramContainer"></div>
-    </div>
-    
-
-
-    <script src="/public/js/external/jquery-1.11.3.min.js"></script>
+	<title>Workflow Designer</title>
+	
+	<link rel="stylesheet" type="text/css" href="/public/css/Stylesheet.css">
+	<script src="/public/js/external/jquery-1.11.3.min.js"></script>
     <script src="/public/js/external/jquery-ui-1.11.4.min.js"></script>
     <script src="/public/js/external/biltong-0.2.js"></script>
     <script src="/public/js/external/farahey-0.5.js"></script>
     <script src="/public/js/external/jsPlumb-1.7.9-min.js"></script>
     <script src="/public/js/external/jquery.panzoom-2.0.5.js"></script>
+	<script src="/public/js/workflow.js"></script>
+</head>
+
+<body>
+
+    <h1 id="header" style="font-family:Verdana"></h1>
+    <div id="canvas">
+    	<div id="container"></div>
+    </div>
+
 
     <script>
-    
-    /* Start - http://morrisonpitt.com/farahey/ */
-    var _offset = function(id) {
-        var el = $("#" + id)[0],
-            _ = function(p) {
-                var v = el.style[p];
-                return parseInt(v.substring(0, v.length - 2));
-            };
-        return {
-            left:_("left"),
-            top:_("top")
-        };
-    };
 
-    var _setOffset = function(id, o) {
-        var el = $("#" + id)[0];
-        el.style.left = o.left + "px";
-        el.style.top = o.top + "px";
-    };
-    
-
-    
-    /* End - http://morrisonpitt.com/farahey/ */
-    
-    var gridFree = function(container) {
-    	return function(id, current, delta) {
-    		
-            return {
-                left:delta.left,
-                top:delta.top
-            };
-    	};
-    };
-    
-    $.ajax({
-    	url: 'http://localhost:8080/api/wf/workflows/workflow-log',
-    	method: 'GET',
-    	crossDomain: true,
-    	headers: {Accept: 'application/json'}
-    })
-    .done(function(data, status, xhr) {
-    	console.log(data);
-
-    	$('#diagramContainer').position({
-    		my: 'center',
-    		at: 'center',
-    		of: $('#canvas')
-    	});
-		
-    	
-    	// jsplumb everything
-    	jsPlumb.ready(function() {
-    		
-
-    	      var start, end;
-    	        
-    	      var common = {
-    	    		    connector: ["Flowchart"],
-    	    		    anchor: ["Left", "Right"],
-    	    		    endpoint: ["Dot", {radius: 5}]
-    	    };
-    	      
-    	      var common2 = {
-  	    		    connector: ["Flowchart"],
-	    		    anchor: ["Top", "Bottom"],
-	    		    endpoint: ["Dot", {radius: 5}]  
-    	      };
-    	      
-              var elements = [];
-    	        // set the title
-    	        $('#workflowName').html(data.name);
-    	        
-    	        var prevElement, my, at;
-    	        
-    	        // create the step divs and get the start/end ids
-    	        $.each(data.steps, function(index, step) {
-    	           
-    	        	if (!prevElement) {
-    	        		
-    	        		var cw = $('#canvas').width();
-    	        		
-    	        		prevElement = $('#diagramContainer');
-    	        		my = 'left-' + (cw/2) + ' center-230';
-    	        		at = 'center';
-    	        	}
-    	        	else {
-                        my = 'center';
-                        at = 'right+150';
-    	        	}
-    	            
-    	        	var itemClass;
-    	        	
-    	        	if (step.activity.type === 'start') {
-    	        		itemClass = 'item startItem';
-    	        	}
-    	        	else if (step.activity.type === 'end') {
-    	        		itemClass = 'item endItem';
-    	        	}
-    	        	else if (step.activity.type === 'task') {
-    	        		itemClass = 'item taskItem';
-    	        	}
-    	        	else {
-    	        		itemClass = 'item';
-    	        	}
-    	        	
-    	            // add the divs
-    	            $('#diagramContainer').append('<div id="' + step.id + '" class="connectable"><div class="' + itemClass + '"><p>' + step.label + '</p></div></div>');
-    	            $('#' + step.id)
-    	            .position({
-    	            	my: my,
-    	            	at: at,
-    	            	of: prevElement,
-    	            	//within: $('#diagramContainer'),
-    	            	//colission: 'fit'
-    	            });
-    	            
-    	            prevElement = $('#' + step.id);
-    	            
-    	            elements.push(step.id);
-    	            
-    	            
-    	        });
-
-
-                
-    	        // plumb everything
-    	        $.each(data.steps, function(index, step) {
-    	        	
-    	        	var success = step.success   ? step.success   : end;
-    	        	var fail    = step.fail      ? step.fail      : end;
-    	        	var except  = step.exception ? step.exception : end;
-    	        	
-    	        	if (success !== step.id) {
-
-                        jsPlumb.connect({
-                            source: step.id,
-                            target: success,
-                            anchor: "Right",
-                            overlays:[ ["Arrow" , { width:12, length:12, location:0.67 }] ]
-                        }, common);
-    	        	}
-    	        	
-    	        	if (fail) {
-                        jsPlumb.connect({
-                            source: step.id,
-                            target: fail,
-                            anchor: "Bottom",
-                            overlays:[ ["Arrow" , { width:12, length:12, location:0.67 }] ]
-                        }, common);
-    	        	}
-    	        	
-    	        });
-    	        
-                
-                var _dragElement = null,
-                _dragFilter = function(id) {
-                    return id != _dragElement;
-                };
-
-            var m8 = new Magnetizer({
-                container:$("#diagramContainer"),
-                getContainerPosition:function(c) { return c.offset(); },
-                getPosition:_offset,
-                getSize:function(id) { return [ $("#" + id).outerWidth(), $("#" + id).outerHeight() ]; },
-                getId : function(id) { return id; },
-                setPosition:_setOffset,
-                elements:elements,
-                filter:_dragFilter,
-                padding:[5,5],
-                constrain:gridFree($('#diagramContainer'))
-            });
-    	        
-            // run it to start with
-            //m8.executeAtCenter();
-            jsPlumb.repaintEverything();
-
-            
-            jsPlumb.draggable(elements, {
-                start:function(p) {
-                    _dragElement = p.el.getAttribute("id");
-                },
-                drag:function(p) {
-                    m8.executeAtEvent(p.e);
-                    // here it might be the case that farahey should fire individual move events, because with lots of nodes
-                    // maybe repainting everything is wasteful.
-                    jsPlumb.repaintEverything();
-                },
-                stop:function(p) {
-                    _dragElement = null;
-                }
-            });
-            
-    		
-    	});
-        $panzoom = $('#diagramContainer').panzoom();
-
-        $panzoom.parent().on('mousewheel.focal', function( e ) {
-        	
-        	if (event.shiftKey) {
-                e.preventDefault();
-                var delta = e.delta || e.originalEvent.wheelDelta;
-                var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
-                var dc = document.getElementById('diagramContainer');
-                var offsetX  = Math.abs(dc.offsetLeft) + e.clientX;
-                var offsetY  = Math.abs(dc.offsetTop) + e.clientY;
-                
-                var focal = {
-                	clientX: offsetX,
-                	clientY: offsetY
-                };
-               
-                $panzoom.panzoom('zoom', zoomOut, {
-                  increment: 0.1,
-                  animate: false,
-                  silent: true,
-                  focal: focal
-                });
-        	}
-        });
-
-    })
-    .fail(function(xhr, status, err) {
-    	console.log('ERROR', err);
-    });
+	    $.ajax({
+	    	url: 'http://localhost:8080/api/wf/workflows/workflow-log',
+	    	method: 'GET',
+	    	crossDomain: true,
+	    	headers: {Accept: 'application/json'}
+	    })
+	    .done(function(data, status, xhr) {
+	    	console.log(data);
+	
+	    	// jsplumb everything
+	    	jsPlumb.ready(function() {
+	    		_addNodes('canvas', 'container', 'header', data);
+	    		_initCanvas('container');
+	    	});
+	    })
+	    .fail(function(xhr, status, err) {
+	    	console.log('ERROR', err);
+	    });
    
     </script> 
 
-
-
 </body>
-
 </html>
