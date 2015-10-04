@@ -16,8 +16,12 @@
                 padding-top: 50px;
                 padding-bottom: 20px;
             }
+            .ui-widget * {
+				outline: none;
+			}​
         </style>
         <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="css/jquery-ui-custom/jquery-ui.min.css">
         <link rel="stylesheet" type="text/css" href="css/main.css">
         <link rel="stylesheet" type="text/css" href="css/workflow.css">
 
@@ -65,11 +69,26 @@
 		<div id="wf-viewport">
 			<div id="wf-workarea"></div>
 		</div>
-      	
-      	<div id="wf-menu">
-			TESTING MENU
-		</div>
       
+
+      	<div id="wf-menu">
+      		<div id="itemSelect" style="height:600px;">
+      			<h5>workflows</h5>
+      			<div style="height: 450px;">
+					workflows
+      			</div>
+      			<h5>tasks</h5>
+      			<div style="height: 450px;">
+      				tasks
+      			</div>
+      			<h5>general</h5>
+      			<div style="height: 450px;">
+      				general
+      			</div>
+      		</div>
+      	
+		</div>
+      <img src="img/chevrons.svg" class="rotate0" id="wf-menuToggle" onClick="toggleMenu()">
       
              <p><a class="btn btn-primary btn-lg" href="#" role="button" onClick="toggleMenu()">Show Menu &raquo;</a></p>
       </div>
@@ -119,13 +138,21 @@
         		var show = ($('#wf-menu').css('display') === 'none') ? false : true;
 
         		if (show) {
-        			$('#wf-menu').hide('slide', {direction: 'left', easing: 'easeOutSine'});
+        			$('#wf-menu').hide('slide', {direction: 'left'}, 200);
+        			$('#wf-menuToggle').animate({left: '-=200'}, 200);
+        			$('#wf-menuToggle').removeClass('rotate180').addClass('rotate0');
         		}
         		else {
-        			$('#wf-menu').show('slide', {direction: 'left', easing: 'easeOutSine'});
+        			$('#wf-menu').show('slide', {direction: 'left'}, 200);
+        			$('#wf-menuToggle').animate({left: '+=200'}, 200);
+        			$('#wf-menuToggle').removeClass('rotate0').addClass('rotate180');
         		}
 
         	}
+        	
+	    	$( "#itemSelect" ).accordion({
+	    	      heightStyle: "content"
+	        });
         	
 		    $.ajax({
 		    	url: 'http://localhost:8080/api/wf/workflows/workflow-log',
@@ -140,7 +167,7 @@
 		    	jsPlumb.ready(function() {
 		    		_addNodes('wf-viewport', 'wf-workarea', 'wf-header', data, 'small');
 		    		_initCanvas('wf-workarea');
-		    		jsPlumb.repaintEverything();		    		
+		    		jsPlumb.repaintEverything();	
 		    	});
 		    })
 		    .fail(function(xhr, status, err) {

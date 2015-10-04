@@ -63,6 +63,13 @@ var _addNodes = function(canvas, container, header, data, size) {
 		of : $('#wf-viewport')
 	});
 
+	$('#wf-menuToggle').position({
+		my : 'left center',
+		at : 'left center',
+		of : $('#wf-viewport')
+	});
+	$('#wf-menuToggle').show();
+	
 	var prevElement, my, at, start, end;
 
 	// create the step divs and get the start/end ids

@@ -87,6 +87,17 @@ div.startItem, div.endItem p {
 	font-weight: bold;
 }
 
+.rotate180 {
+	-ms-transform: rotate(180deg);
+	-webkit-transform: rotate(180deg);
+	transform: rotate(180deg);
+}
+.rotate0 {
+	-ms-transform: rotate(0deg);
+	-webkit-transform: rotate(0deg);
+	transform: rotate(0deg);
+}
+
 #wf-workarea {
 	padding: 0px;
 	width: 10000px;
@@ -109,8 +120,16 @@ div.startItem, div.endItem p {
 	z-index:65000;
 	width: 200px;
 	height: 600px;
-	background-color: #000000;
+	background-color: #cccccc;
+	border: 1px solid #c0c0c0;
+	color: #000000;
 	display: none;
-	color: #ffffff;
+}
+
+#wf-menuToggle {
+	position: absolute;
+	z-index:65000;
+	width: 20px;
+	height: 20px;
 }
 
