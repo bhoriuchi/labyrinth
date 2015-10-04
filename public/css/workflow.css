@@ -101,4 +101,16 @@ div.startItem, div.endItem p {
 	height: 600px;
 	border: 1px solid #cccccc;
 	border-radius: 2px;
+	position: relative;
 }
+
+#wf-menu {
+	position: absolute;
+	z-index:65000;
+	width: 200px;
+	height: 600px;
+	background-color: #000000;
+	display: none;
+	color: #ffffff;
+}
+

@@ -36,22 +36,31 @@ var _setOffset = function(id, o) {
 // add the nodes to the canvas container
 var _addNodes = function(canvas, container, header, data, size) {
 	
-	var sizeClass = 'item-md';
+	var sizeClass  = 'item-md';
+	var itemHeight = 75;
 	
 	if (size === 'small') {
 		sizeClass = 'item-sm';
+		itemHeight = 35;
 	}
 	else if (size === 'large') {
 		sizeClass = 'item-lg';
+		itemHeight = 100;
 	}
 	
 	// set the title
 	$('#' + header).html(data.name);
 
 	$('#' + container).position({
-		my : 'center',
-		at : 'center',
+		my : 'center center',
+		at : 'left top',
 		of : $('#' + canvas)
+	});
+	
+	$('#wf-menu').position({
+		my : 'left top',
+		at : 'left top',
+		of : $('#wf-viewport')
 	});
 
 	var prevElement, my, at, start, end;
@@ -60,12 +69,9 @@ var _addNodes = function(canvas, container, header, data, size) {
 	$.each(data.steps, function(index, step) {
 
 		if (!prevElement) {
-
-			var cw = $('#' + canvas).width();
 			var ch = $('#' + canvas).height();
-
 			prevElement = $('#' + container);
-			my = 'left-' + (cw * 0.8) + ' top-' + (ch * 0.7);
+			my = 'left+20 top+' + (ch - (itemHeight + 20));
 			at = 'center';
 		} else {
 			my = 'center';

@@ -17,8 +17,8 @@
                 padding-bottom: 20px;
             }
         </style>
-        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
-        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="css/main.css">
         <link rel="stylesheet" type="text/css" href="css/workflow.css">
 
         <script src="js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
@@ -36,7 +36,10 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <img src="img/labyrinth.svg" style="width:35px;height:35px;"><a class="navbar-brand" href="#">LABYRINTH</a>
+          <a class="navbar-brand" href="#">
+          	<img src="img/labyrinth.svg" style="width:20px;height:20px;float:left;">
+          	<p style="float:right;">&nbsp;&nbsp;LABYRINTH</p>
+          </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
         
@@ -58,18 +61,17 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
       <div class="container">
+		<p id="wf-header" style="font-family:Verdana"></p>
+		<div id="wf-viewport">
+			<div id="wf-workarea"></div>
+		</div>
+      	
+      	<div id="wf-menu">
+			TESTING MENU
+		</div>
       
       
-      
-      
-      			<p id="wf-header" style="font-family:Verdana"></p>
-			<div id="wf-viewport">
-				<div id="wf-workarea"></div>
-			</div>
-      
-      
-      
-             <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+             <p><a class="btn btn-primary btn-lg" href="#" role="button" onClick="toggleMenu()">Show Menu &raquo;</a></p>
       </div>
     </div>
 
@@ -112,6 +114,19 @@
         
         <script>
 
+        	function toggleMenu() {
+
+        		var show = ($('#wf-menu').css('display') === 'none') ? false : true;
+
+        		if (show) {
+        			$('#wf-menu').hide('slide', {direction: 'left', easing: 'easeOutSine'});
+        		}
+        		else {
+        			$('#wf-menu').show('slide', {direction: 'left', easing: 'easeOutSine'});
+        		}
+
+        	}
+        	
 		    $.ajax({
 		    	url: 'http://localhost:8080/api/wf/workflows/workflow-log',
 		    	method: 'GET',
@@ -125,8 +140,7 @@
 		    	jsPlumb.ready(function() {
 		    		_addNodes('wf-viewport', 'wf-workarea', 'wf-header', data, 'small');
 		    		_initCanvas('wf-workarea');
-		    		jsPlumb.repaintEverything();
-	
+		    		jsPlumb.repaintEverything();		    		
 		    	});
 		    })
 		    .fail(function(xhr, status, err) {
