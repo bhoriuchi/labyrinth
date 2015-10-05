@@ -71,18 +71,18 @@
 		</div>
       
 
-      	<div id="wf-menu">
-      		<div id="itemSelect" style="height:600px;">
-      			<h5>workflows</h5>
-      			<div style="height: 450px;">
+      	<div id="wf-menu" style="display:none;">
+      		<div id="itemSelect" style="height:600px">
+      			<h3>workflows</h3>
+      			<div>
 					workflows
       			</div>
-      			<h5>tasks</h5>
-      			<div style="height: 450px;">
+      			<h3>tasks</h3>
+      			<div>
       				tasks
       			</div>
-      			<h5>general</h5>
-      			<div style="height: 450px;">
+      			<h3>general</h3>
+      			<div>
       				general
       			</div>
       		</div>
@@ -133,10 +133,14 @@
         
         <script>
 
+        	var menuLoaded = false;
+        
         	function toggleMenu() {
 
         		var show = ($('#wf-menu').css('display') === 'none') ? false : true;
 
+
+        		
         		if (show) {
         			$('#wf-menu').hide('slide', {direction: 'left'}, 200);
         			$('#wf-menuToggle').animate({left: '-=200'}, 200);
@@ -148,12 +152,16 @@
         			$('#wf-menuToggle').removeClass('rotate0').addClass('rotate180');
         		}
 
+        		if (!menuLoaded) {
+        	    	$( "#itemSelect" ).accordion({
+      	    	      heightStyle: "fill"
+      	        	});
+        		}
+        		else {
+        			menuLoaded = true;
+        		}
         	}
-        	
-	    	$( "#itemSelect" ).accordion({
-	    	      heightStyle: "content"
-	        });
-        	
+        	        	
 		    $.ajax({
 		    	url: 'http://localhost:8080/api/wf/workflows/workflow-log',
 		    	method: 'GET',
