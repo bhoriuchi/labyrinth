@@ -2,52 +2,57 @@
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>LABYRINTH Workflow</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="">
+<!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>LABYRINTH Workflow</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="css/bootstrap.min.css">
-        <style>
-            body {
-                padding-top: 50px;
-                padding-bottom: 20px;
-            }
-            .ui-widget * {
-				outline: none;
-			}​
-        </style>
-        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
-        <link rel="stylesheet" type="text/css" href="css/jquery-ui-custom/jquery-ui.min.css">
-        <link rel="stylesheet" type="text/css" href="css/main.css">
-        <link rel="stylesheet" type="text/css" href="css/workflow.css">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<style>
+body {
+	padding-top: 50px;
+	padding-bottom: 20px;
+}
 
-        <script src="js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
-    </head>
-    <body>
-        <!--[if lt IE 8]>
+.ui-widget * {
+	outline: none;
+}
+​
+</style>
+<link rel="stylesheet" type="text/css" href="./css/bootstrap-theme.min.css">
+<link rel="stylesheet" type="text/css" href="./css/jquery-ui-custom/jquery-ui.min.css">
+<link rel="stylesheet" type="text/css" href="./css/main.css">
+<link rel="stylesheet" type="text/css" href="./css/workflow.css">
+
+<script src="./js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+</head>
+<body>
+	<!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">
-          	<img src="img/labyrinth.svg" style="width:20px;height:20px;float:left;">
-          	<p style="float:right;">&nbsp;&nbsp;LABYRINTH</p>
-          </a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-        
-        <!--
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+					aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#"> <img src="img/labyrinth.svg"
+					style="width: 20px; height: 20px; float: left;">
+					<p style="float: right;">&nbsp;&nbsp;LABYRINTH</p>
+				</a>
+			</div>
+			<div id="navbar" class="navbar-collapse collapse">
+
+				<!--
           <form class="navbar-form navbar-right" role="form">
             <div class="form-group">
               <input type="text" placeholder="Email" class="form-control">
@@ -58,132 +63,196 @@
             <button type="submit" class="btn btn-success">Sign in</button>
           </form>
           -->
-        </div><!--/.navbar-collapse -->
-      </div>
-    </nav>
-
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-		<p id="wf-header" style="font-family:Verdana"></p>
-		<div id="wf-viewport">
-			<div id="wf-workarea"></div>
+			</div>
+			<!--/.navbar-collapse -->
 		</div>
-      
+	</nav>
 
-      	<div id="wf-menu" style="display:none;">
-      		<div id="itemSelect" style="height:600px">
-      			<h3>workflows</h3>
-      			<div>
-					workflows
-      			</div>
-      			<h3>tasks</h3>
-      			<div>
-      				tasks
-      			</div>
-      			<h3>general</h3>
-      			<div>
-      				general
-      			</div>
-      		</div>
-      	
+	<!-- Main jumbotron for a primary marketing message or call to action -->
+	<div class="jumbotron">
+		<div class="container">
+			<div id="wf-menu" style="display: none;">
+				<div id="itemSelect" style="height: 600px">
+					<h3>General</h3>
+					<div>
+					   general
+					</div>
+					<h3>Tasks</h3>
+					<div>tasks</div>
+					<h3>Workflows</h3>
+					<div>workflows</div>
+				</div>
+			</div>
+			<img src="./img/chevrons.svg" class="rotate0" id="wf-menuToggle"
+				onClick="toggleMenu()">
+
+			<p id="wf-header" style="font-family: Verdana"></p>
+			<div id="wf-viewport">
+				<div id="wf-workarea"></div>
+			</div>
+
+
+
+
+			<p>
+				<a class="btn btn-primary btn-lg" href="#" role="button"
+					onClick="toggleMenu()">Show Menu &raquo;</a>
+			</p>
 		</div>
-      <img src="img/chevrons.svg" class="rotate0" id="wf-menuToggle" onClick="toggleMenu()">
-      
-             <p><a class="btn btn-primary btn-lg" href="#" role="button" onClick="toggleMenu()">Show Menu &raquo;</a></p>
-      </div>
-    </div>
+	</div>
 
-    <div class="container">
-      <!-- Example row of columns -->
-      <div class="row">
-        <div class="col-md-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div>
-        <div class="col-md-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-       </div>
-        <div class="col-md-4">
-          <h2>Heading</h2>
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div>
-      </div>
+	<div class="container">
+		<!-- Example row of columns -->
+		<div class="row">
+			<div class="col-md-4">
+				<h2>Heading</h2>
+				<p>Donec id elit non mi porta gravida at eget metus. Fusce
+					dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh,
+					ut fermentum massa justo sit amet risus. Etiam porta sem malesuada
+					magna mollis euismod. Donec sed odio dui.</p>
+				<p>
+					<a class="btn btn-default" href="#" role="button">View details
+						&raquo;</a>
+				</p>
+			</div>
+			<div class="col-md-4">
+				<h2>Heading</h2>
+				<p>Donec id elit non mi porta gravida at eget metus. Fusce
+					dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh,
+					ut fermentum massa justo sit amet risus. Etiam porta sem malesuada
+					magna mollis euismod. Donec sed odio dui.</p>
+				<p>
+					<a class="btn btn-default" href="#" role="button">View details
+						&raquo;</a>
+				</p>
+			</div>
+			<div class="col-md-4">
+				<h2>Heading</h2>
+				<p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in,
+					egestas eget quam. Vestibulum id ligula porta felis euismod semper.
+					Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum
+					nibh, ut fermentum massa justo sit amet risus.</p>
+				<p>
+					<a class="btn btn-default" href="#" role="button">View details
+						&raquo;</a>
+				</p>
+			</div>
+		</div>
 
-      <hr>
+		<hr>
 
-      <footer>
-        <p>&copy; Company 2015</p>
-      </footer>
-    </div> <!-- /container -->        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+		<footer>
+			<p>&copy; Company 2015</p>
+		</footer>
+	</div>
+	<!-- /container -->
+	<script
+		src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script>
+		window.jQuery
+				|| document
+						.write('<script src="./js/vendor/jquery-1.11.2.min.js"><\/script>')
+	</script>
 
-        <script src="js/vendor/bootstrap.min.js"></script>
-    	<script src="js/vendor/jquery-ui-1.11.4.min.js"></script>
-    	<script src="js/vendor/biltong-0.2.js"></script>
-    	<script src="js/vendor/farahey-0.5.js"></script>
-    	<script src="js/vendor/jsPlumb-1.7.9-min.js"></script>
-    	<script src="js/vendor/jquery.panzoom-2.0.5.js"></script>
-		<script src="js/workflow.js"></script>
-        <script src="js/main.js"></script>
-        
-        <script>
+	<script src="./js/vendor/bootstrap.min.js"></script>
+	<script src="./js/vendor/jquery-ui-1.11.4.min.js"></script>
+	<script src="./js/vendor/biltong-0.2.js"></script>
+	<script src="./js/vendor/farahey-0.5.js"></script>
+	<script src="./js/vendor/jsPlumb-1.7.9-min.js"></script>
+	<script src="./js/vendor/jquery.panzoom-2.0.5.js"></script>
+	<script src="./js/workflow.js"></script>
+	<script src="./js/main.js"></script>
 
-        	var menuLoaded = false;
-        
-        	function toggleMenu() {
+	<script>
+		var menuLoaded  = false;
+		var $menu       = $('#wf-menu');
+		var $viewport   = $('#wf-viewport');
+		var $menuToggle = $('#wf-menuToggle');
 
-        		var show = ($('#wf-menu').css('display') === 'none') ? false : true;
-
-
-        		
-        		if (show) {
-        			$('#wf-menu').hide('slide', {direction: 'left'}, 200);
-        			$('#wf-menuToggle').animate({left: '-=200'}, 200);
-        			$('#wf-menuToggle').removeClass('rotate180').addClass('rotate0');
-        		}
-        		else {
-        			$('#wf-menu').show('slide', {direction: 'left'}, 200);
-        			$('#wf-menuToggle').animate({left: '+=200'}, 200);
-        			$('#wf-menuToggle').removeClass('rotate0').addClass('rotate180');
-        		}
-
-        		if (!menuLoaded) {
-        	    	$( "#itemSelect" ).accordion({
-      	    	      heightStyle: "fill"
-      	        	});
-        		}
-        		else {
-        			menuLoaded = true;
-        		}
-        	}
-        	        	
-		    $.ajax({
-		    	url: 'http://localhost:8080/api/wf/workflows/workflow-log',
-		    	method: 'GET',
-		    	crossDomain: true,
-		    	headers: {Accept: 'application/json'}
-		    })
-		    .done(function(data, status, xhr) {
-		    	console.log(data);
+		$( window ).resize(function() {
+			var show = ($menu.css('display') === 'none') ? false : true;
+			
+			if (show) {
+				$menu.position({
+					my: 'left top',
+					at: 'left top',
+					of: $viewport
+				});
+			}
+			else {
+				$menu.show();
+				
+                $menu.position({
+                    my: 'left top',
+                    at: 'left top',
+                    of: $viewport
+                });
+                
+               $menu.hide();
+			}
+			
+		});
 		
-		    	// jsplumb everything
-		    	jsPlumb.ready(function() {
-		    		_addNodes('wf-viewport', 'wf-workarea', 'wf-header', data, 'small');
-		    		_initCanvas('wf-workarea');
-		    		jsPlumb.repaintEverything();	
-		    	});
-		    })
-		    .fail(function(xhr, status, err) {
-		    	console.log('ERROR', err);
-		    });
-   
-    	</script> 
-        
-        
-    </body>
+		function toggleMenu() {
+
+			var show = ($menu.css('display') === 'none') ? false : true;
+
+			if (show) {
+				
+
+				$menu.hide('slide', {
+					direction : 'left'
+				}, 200);
+				$menuToggle.animate({
+					left : '-=' + $menu.width()
+				}, 200);
+				$menuToggle.removeClass('rotate180')
+						.addClass('rotate0');
+			} else {
+
+				$menu.show('slide', {
+					direction : 'left'
+				}, 200);
+								
+				$menuToggle.animate({
+					left : '+=' + $menu.width()
+				}, 200);
+				$menuToggle.removeClass('rotate0')
+						.addClass('rotate180');
+			}
+			
+			if (!menuLoaded) {
+				$("#itemSelect").accordion({
+					heightStyle : "fill"
+				});
+			} else {
+				menuLoaded = true;
+			}
+		}
+
+		$.ajax({
+			url : 'http://localhost:8080/api/wf/workflows/workflow-log',
+			method : 'GET',
+			crossDomain : true,
+			headers : {
+				Accept : 'application/json'
+			}
+		}).done(
+				function(data, status, xhr) {
+					console.log(data);
+
+					// jsplumb everything
+					jsPlumb.ready(function() {
+						_addNodes('wf-viewport', 'wf-workarea', 'wf-header',
+								data, 'small');
+						_initCanvas('wf-workarea');
+						jsPlumb.repaintEverything();
+					});
+				}).fail(function(xhr, status, err) {
+			console.log('ERROR', err);
+		});
+	</script>
+
+
+</body>
 </html>
