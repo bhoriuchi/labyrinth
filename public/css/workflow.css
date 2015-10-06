@@ -20,17 +20,54 @@ div.connectable {
 	overflow: visible;
 }
 
+ul.itemList {
+	list-style-type: none;
+	padding:0px;
+}
+
+li.itemList {
+	display:inline-block;
+	padding-right: 20px;
+	padding-top: 20px;
+}
+div.itemListLabel {
+	width: 75px;
+	font-size: 8pt;
+	font-family: Arial;
+	text-align: center;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2; /* number of lines to show */
+	line-height: 10px; /* fallback */
+	max-height: 20px; /* fallback */
+}
+
+div.centered {
+	margin: 0 auto;
+}
+
+.menuObject {
+	width: 75px;
+}
+
+.magnetized {
+	
+}
+
 div.item {
 	position: relative;
 	display: table;
 }
 
 div.itemLabel {
+	background-color: #fcfcfc;
+	z-index: 3000;
 	position: relative;
 	font-family: Arial;
 	font-size: 10px;
 	text-align: center;
-	width: 150px;
+	width:150px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	display: -webkit-box;
@@ -87,6 +124,14 @@ div.startItem, div.endItem p {
 	font-weight: bold;
 }
 
+._jsPlumb_connector {
+    cursor: pointer;
+}
+
+._jsPlumb_endpoint {
+    cursor: pointer;
+}
+
 .rotate180 {
 	-ms-transform: rotate(180deg);
 	-webkit-transform: rotate(180deg);
@@ -102,17 +147,18 @@ div.startItem, div.endItem p {
 	padding: 0px;
 	width: 10000px;
 	height: 10000px;
-	position: absolute;
-	background-color: #fcfcfc;
+	position: relative;
+	background-color: transparent;
 }
 
 #wf-viewport {
 	padding: 0px;
 	width: 100%;
 	height: 600px;
-	border: 1px solid #cccccc;
+	outline: 1px solid #cccccc;
 	border-radius: 2px;
 	position: relative;
+	background-color: #fcfcfc;
 }
 
 #wf-menu {
@@ -128,6 +174,7 @@ div.startItem, div.endItem p {
 	z-index:65000;
 	width: 20px;
 	height: 20px;
+	cursor: context-menu;
 }
 
 
@@ -144,11 +191,20 @@ div.startItem, div.endItem p {
 }
 
 #itemSelect .ui-accordion-content {
-    width: 100%;
     border: 0px;
     background-color: #F0FAFF;
     font-family: Verdana;
     font-size: 9pt;
+    padding: 0px;
+}
+
+#itemSelect .ui-accordion-content > div:first-of-type {
+    border: 0px;
+    min-height: 600px;
+    background-color: #F0FAFF;
+    font-family: Verdana;
+    font-size: 9pt;
+    padding: 5px;
 }
 
 #itemSelect .ui-accordion-content a {
@@ -156,15 +212,15 @@ div.startItem, div.endItem p {
 }
 
 #itemSelect .ui-accordion-header {
-	text-shadow: 1px 1px 1px #808080;
+	/* text-shadow: -1px -1px 0 #ccc, 1px -1px 0 #ccc, -1px 1px 0 #ccc, 1px 1px 0 #ccc; */
     background-color: #ccc;
     color: #fff;
+    letter-spacing: 1px;
     margin: 0px;
     line-height: 18px;
     font-size: 9pt;
     text-indent: 10px;
-    font-weight: normal;
-    font-family: Verdana;
+    font-family: arial;
     border: 0px;
 }
 
