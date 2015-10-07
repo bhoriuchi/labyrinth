@@ -123,6 +123,13 @@
 		//"anotherCoolGlobal",
 		//"iLoveDouglas"
 		"Java", "JavaFX", "$ARG" //no effect
-	]
+	],
 	//,	"indent" : 2 // Specify indentation spacing
+	"globals": {
+		"$": false,
+		"jsPlumb": false,
+		"Magnetizer": false,
+		"document": false,
+		"window": false
+	}
 }

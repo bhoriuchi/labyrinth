@@ -108,7 +108,7 @@ body {
 
 
 
-			<p>
+			<p style="display:none;">
 				<a class="btn btn-primary btn-lg" href="#" role="button"
 					onClick="toggleMenu()">Show Menu &raquo;</a>
 			</p>
@@ -163,9 +163,7 @@ body {
 	<script
 		src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script>
-		window.jQuery
-				|| document
-						.write('<script src="./js/vendor/jquery-1.11.2.min.js"><\/script>')
+		window.jQuery || document.write('<script src="./js/vendor/jquery-1.11.2.min.js"><\/script>')
 	</script>
 
 	<script src="./js/vendor/bootstrap.min.js"></script>
@@ -177,173 +175,9 @@ body {
 	<script src="./js/workflow.js"></script>
 	<script src="./js/main.js"></script>
 
-	<script>
-		// first scroll to the top so that the workflow is displayed in the correct spot.
-		// this is a workaround
-		window.scrollTo(0, 0);
-		var activities, workflows;
-		var menuLoaded  = false;
-		var $menu       = $('#wf-menu');
-		var $viewport   = $('#wf-viewport');
-		var $workarea   = $('#wf-workarea');
-		var $menuToggle = $('#wf-menuToggle');
+    <script>
 
-		$( window ).resize(function() {
-			var show = ($menu.css('display') === 'none') ? false : true;
-			
-			if (show) {
-				$menu.position({
-					my: 'left top',
-					at: 'left top',
-					of: $viewport
-				});
-			}
-			else {
-				$menu.show();
-				
-                $menu.position({
-                    my: 'left top',
-                    at: 'left top',
-                    of: $viewport
-                });
-                
-               $menu.hide();
-			}
-			
-		});
-		
-		
-		$viewport.droppable({
-			drop: function(e, ui) {
-				console.log('dropped', ui, e);
-				
 
-				var newId = 'item_' + e.timeStamp;
-				
-				
-				ui.draggable.clone().attr('id', newId).appendTo($workarea).offset(ui.offset);
-				
-				//$('#' + newId).css('background-color', 'red');
-			}
-		});
-		
-		function toggleMenu() {
-
-			var show = ($menu.css('display') === 'none') ? false : true;
-
-			if (show) {
-				
-
-				$menu.hide('slide', {
-					direction : 'left'
-				}, 200);
-				$menuToggle.animate({
-					left : '-=' + $menu.width()
-				}, 200);
-				$menuToggle.removeClass('rotate180')
-						.addClass('rotate0');
-			} else {
-
-				$menu.show('slide', {
-					direction : 'left'
-				}, 200);
-								
-				$menuToggle.animate({
-					left : '+=' + $menu.width()
-				}, 200);
-				$menuToggle.removeClass('rotate0')
-						.addClass('rotate180');
-			}
-			
-			if (!menuLoaded) {
-				$("#itemSelect").accordion({
-					heightStyle : "fill",
-					clearStyle: true,
-					autoHeight: false
-				});
-			} else {
-				menuLoaded = true;
-			}
-		}
-
-		// get the workflow
-		$.ajax({
-			url : 'http://localhost:8080/api/wf/workflows/workflow-log',
-			method : 'GET',
-			crossDomain : true,
-			headers : {
-				Accept : 'application/json'
-			}
-		})
-		.done(function(data, status, xhr) {
-			console.log(data);
-					
-			// jsplumb everything
-			jsPlumb.ready(function() {
-				_addNodes('wf-viewport', 'wf-workarea', 'wf-header', data, 'small');
-				_initCanvas('wf-workarea');
-				jsPlumb.bind('beforeDrop', function(params) {
-					return params.sourceId !== params.targetId;
-				});
-			});
-		})
-		.fail(function(xhr, status, err) {
-			console.log('ERROR', err);
-		});
-		
-		
-		// get the activities
-		$.ajax({
-			url : 'http://localhost:8080/api/wf/activitys?maxdepth=0',
-			method : 'GET',
-			crossDomain : true,
-			headers : {
-				Accept : 'application/json'
-			}
-		})
-		.done(function(data, status, xhr) {
-			activities = data;
-			
-			for (var i = 0; i < activities.length; i++) {
-				var a = activities[i];
-				if (a.type === 'start' || a.type === 'end') {
-					$('#generalObjects').append('<li class="itemList"><div class="menuObject" wfItemType="' + a.type + '" wfItemId="' + a.id + '"><div class="centered item-sm ' + a.type + 'Item"></div><div class="itemListLabel">' + a.name + '</div></div></li>');
-				}
-				else if (a.type === 'task') {
-					$('#taskObjects').append('<li class="itemList"><div class="menuObject" wfItemType="' + a.type + '" wfItemId="' + a.id + '"><div class="centered item-sm ' + a.type + 'Item"></div><div class="itemListLabel">' + a.name + '</div></div></li>');
-				}
-			}
-			$('.menuObject').draggable({helper: 'clone', appendTo: '#wf-workarea', zIndex: 65100, containment:'#wf-viewport'});
-		})
-		.fail(function(xhr, status, err) {
-			console.log('ERROR', err);
-		});
-		
-		// get the workflows
-		$.ajax({
-			url : 'http://localhost:8080/api/wf/workflows?maxdepth=0',
-			method : 'GET',
-			crossDomain : true,
-			headers : {
-				Accept : 'application/json'
-			}
-		})
-		.done(function(data, status, xhr) {
-			workflows = data;
-			
-			for (var i = 0; i < workflows.length; i++) {
-				var w = workflows[i];
-				$('#workflowObjects').append('<li class="itemList"><div class="menuObject" wfItemType="workflow" wfItemId="' + w.id + '"><div class="centered item-sm workflowItem"></div><div class="itemListLabel">' + w.name + '</div></div></li>');
-				
-			}
-		})
-		.fail(function(xhr, status, err) {
-			console.log('ERROR', err);
-		});
-		
-		
-		
-		
 	</script>
 
 
