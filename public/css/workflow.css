@@ -15,6 +15,7 @@ div.item-lg {
 }
 
 div.connectable {
+	z-index: 32500;
 	position: absolute;
 	border: 0px;
 	overflow: visible;
@@ -44,6 +45,8 @@ div.itemListLabel {
 	max-height: 20px; /* fallback */
 }
 
+
+
 div.centered {
 	margin: 0 auto;
 }
@@ -62,8 +65,8 @@ div.item {
 }
 
 div.itemLabel {
-	background-color: #fcfcfc;
-	z-index: 3000;
+	z-index: 32500;
+    text-shadow: 3px 3px 0 #fcfcfc, -1px 0 #fcfcfc, 0 1px #fcfcfc, 1px 0 #fcfcfc, 0 -1px #fcfcfc;
 	position: relative;
 	font-family: Arial;
 	font-size: 10px;
@@ -127,11 +130,13 @@ div.startItem, div.endItem p {
 
 ._jsPlumb_connector {
     cursor: pointer;
+    opacity: 0.5;
 }
 
 ._jsPlumb_endpoint {
     cursor: pointer;
 }
+
 
 .rotate180 {
 	-ms-transform: rotate(180deg);
@@ -144,12 +149,22 @@ div.startItem, div.endItem p {
 	transform: rotate(0deg);
 }
 
+.gi-25px {
+	font-size: 25px;
+}
+
+
 #wf-workarea {
 	padding: 0px;
 	width: 10000px;
 	height: 10000px;
 	position: relative;
 	background-color: #fcfcfc;
+}
+
+#wf-header {
+	font-family: Verdana
+	font-size: 100px;
 }
 
 #wf-viewport {
@@ -162,16 +177,34 @@ div.startItem, div.endItem p {
 	background-color: transparent;
 }
 
+#wf-droparea {
+	display: none;
+	z-index: -1;
+	height: 600px;
+	width: 20px;
+	background: rgba(0, 0, 0, 0.5);
+}
+
 #wf-menu {
 	position: absolute;
 	z-index:65000;
 	width: 300px;
 	height: 600px;
 	padding: 1px;
+	box-shadow: 1px 1px 3px #888888;
 	overflow: hidden;
 }
 
+
+#wf-toolbar {
+	display: none;
+    z-index: 65001;
+    position: absolute;
+    padding: 10px;
+}
+
 #wf-menuToggle {
+	padding: 2px;
 	z-index:65000;
 	width: 20px;
 	height: 20px;
@@ -183,7 +216,7 @@ div.startItem, div.endItem p {
 	border-top: 0px;
 	border-left: 0px;
 	border-bottom: 0px;
-	border-right: 1px solid #cccccc;
+	border-right: 0px;
 }
 
 #itemSelect .ui-icon
@@ -198,10 +231,17 @@ div.startItem, div.endItem p {
 
 #itemSelect .ui-accordion-content {
     border: 0px;
-    background-color: #F0FAFF;
     font-family: Verdana;
     font-size: 9pt;
     padding: 0px;
+    background: rgba(255,255,255,1);
+    background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(226,236,243,1) 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(255,255,255,1)), color-stop(100%, rgba(226,236,243,1)));
+    background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(226,236,243,1) 100%);
+    background: -o-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(226,236,243,1) 100%);
+    background: -ms-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(226,236,243,1) 100%);
+    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(226,236,243,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e2ecf3', GradientType=0 );
 }
 
 #itemSelect .ui-accordion-content > div:first-of-type {
@@ -210,14 +250,7 @@ div.startItem, div.endItem p {
     font-family: Verdana;
     font-size: 9pt;
     padding: 5px;
-background: rgba(255,255,255,1);
-background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(226,236,243,1) 100%);
-background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(255,255,255,1)), color-stop(100%, rgba(226,236,243,1)));
-background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(226,236,243,1) 100%);
-background: -o-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(226,236,243,1) 100%);
-background: -ms-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(226,236,243,1) 100%);
-background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(226,236,243,1) 100%);
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e2ecf3', GradientType=0 );
+    background: transparent;
 }
 
 #itemSelect .ui-accordion-content a {

@@ -6,8 +6,9 @@
  * variables used through out
  */
 var $steps = [];
-var $menuLoaded, $activities, $workflows;
-var $panzoom, $workarea, $viewport, $menu, $menuToggle, $iconSize;
+var $menuLoaded, $activities, $workflows, $header, $toolbar, $wf;
+var $panzoom, $workarea, $viewport, $menu, $menutoggle, $iconSize;
+var $droparea;
 
 /**
  * gets url path param - http://stackoverflow.com/questions/11582512/how-to-get-url-parameters-with-javascript
@@ -24,13 +25,48 @@ var _getObjects = function() {
 	
 	// set the objects
     $menuLoaded = false;
+    $droparea   = $('#wf-droparea');
+    $toolbar    = $('#wf-toolbar');
+    $header     = $('#wf-header');
     $menu       = $('#wf-menu');
     $viewport   = $('#wf-viewport');
     $workarea   = $('#wf-workarea');
-    $menuToggle = $('#wf-menuToggle');
+    $menutoggle = $('#wf-menuToggle');
     $iconSize   = 'small';
 };
 
+
+var resetPanzoom = function() {
+	$workarea.panzoom('reset');
+};
+
+
+
+
+/**
+ * position the menu in the viewport
+ */
+var _positionMenu = function() {
+    $menu.position({
+        my: 'left top',
+        at: 'left top',
+        of: $viewport
+    });
+    
+	$toolbar.show().position({
+		my: 'right bottom',
+		at: 'right bottom',
+		of: $viewport
+	});
+	
+	$droparea.show()
+	.width($viewport.width() - $menu.width())
+	.position({
+		my: 'right bottom',
+		at: 'right bottom',
+		of: $viewport
+	});
+};
 
 /**
  * handle events
@@ -41,19 +77,11 @@ var _onEvents = function() {
 	$( window ).resize(function() {
 		var show = ($menu.css('display') === 'none') ? false : true;
 		if (show) {
-			$menu.position({
-				my: 'left top',
-				at: 'left top',
-				of: $viewport
-			});
+			_positionMenu();
 		}
 		else {
 			$menu.show();
-            $menu.position({
-                my: 'left top',
-                at: 'left top',
-                of: $viewport
-            });
+            _positionMenu();
            $menu.hide();
 		}
 	});
@@ -69,30 +97,28 @@ var toggleMenu = function() {
     var show = ($menu.css('display') === 'none') ? false : true;
 
     if (show) {
-        
-
         $menu.hide('slide', {
             direction : 'left'
         }, 200);
-        $menuToggle.animate({
+        $menutoggle.animate({
             left : '-=' + $menu.width()
         }, 200);
-        $menuToggle.removeClass('rotate180')
-                .addClass('rotate0');
-    } else {
+        $menutoggle.removeClass('rotate180').addClass('rotate0');
+    }
+    else {
 
         $menu.show('slide', {
             direction : 'left'
         }, 200);
                         
-        $menuToggle.animate({
+        $menutoggle.animate({
             left : '+=' + $menu.width()
         }, 200);
-        $menuToggle.removeClass('rotate0')
-                .addClass('rotate180');
+        $menutoggle.removeClass('rotate0').addClass('rotate180');
     }
     
     if (!$menuLoaded) {
+    	
         $("#itemSelect").accordion({
             heightStyle : "fill",
             clearStyle: true,
@@ -103,13 +129,22 @@ var toggleMenu = function() {
                 activeHeader: 'ui-icon-circle-triangle-s'
             }
         });
-    } else {
+    }
+    else {
         $menuLoaded = true;
     }
 };
 
 
-
+var _makeMenuDraggable = function() {
+    $('.menuObject').draggable({
+    	helper: 'clone',
+    	appendTo: 'body',
+    	zIndex: 65100,
+    	revert: true,
+    	revertDuration: 200
+    });
+};
 
 
 
@@ -149,108 +184,79 @@ var _setOffset = function(id, o) {
  * 
  */
 var connectorPaintStyle = {
-    	lineWidth: 2,
-    	strokeStyle: "green",
-    	joinstyle: "round"
-    },
-    connectorHoverStyle = {
-    	lineWidth: 4,
-    	strokeStyle: "#216477",
-    	cursor: "pointer"
-    },
-    endpointHoverStyle = {
-    	fillStyle: "#216477",
-    	strokeStyle: "#216477"
-    },
-    successEndpoint = {
-            endpoint: "Dot",
-            paintStyle: {
-                strokeStyle: "transparent",
-                fillStyle: "transparent",
-                radius: 7,
-                lineWidth: 0
-            },
-            isSource: true,
-            connector: [ "Flowchart", { stub: [30, 30], gap: 5, cornerRadius: 5, alwaysRespectStubs: true } ],
-            connectorStyle: {
-            	lineWidth: 2,
-            	strokeStyle: "green",
-            	joinstyle: "round"
-            },
-            hoverPaintStyle: {
-            	fillStyle: "green"
-            },
-            connectorHoverStyle: {
-            	fillStyle: "green"
-            },
-            dragOptions: {},
-            connectorOverlays: [
-                [ "Arrow", { width : 8, length : 8, location : 1 } ]
-            ]
+	lineWidth: 2,
+    strokeStyle: "green",
+    joinstyle: "round"
+};
+var connectorHoverStyle = {
+    lineWidth: 4,
+    strokeStyle: "#216477",
+    cursor: "pointer"
+};
+var endpointHoverStyle = {
+    fillStyle: "#216477",
+    strokeStyle: "#216477"
+};
+var endpointPaintStyle = {
+	strokeStyle: "transparent",
+	fillStyle: "transparent",
+	radius: 7,
+	lineWidth: 0
+};
 
-    },
-    failEndpoint = {
-            endpoint: "Dot",
-            paintStyle: {
-                strokeStyle: "transparent",
-                fillStyle: "transparent",
-                radius: 7,
-                lineWidth: 0
-            },
-            isSource: true,
-            connector: [ "Flowchart", { stub: [30, 30], gap: 5, cornerRadius: 5, alwaysRespectStubs: true } ],
-            connectorStyle: {
-            	lineWidth: 2,
-            	strokeStyle: "red",
-            	joinstyle: "round"
-            },
-            hoverPaintStyle: {
-            	fillStyle: "red"
-            },
-            connectorHoverStyle: {
-            	fillStyle: "red"
-            },
-            dragOptions: {},
-            connectorOverlays: [
-                [ "Arrow", { width : 8, length : 8, location : 1 } ]
-            ]
+var _endpointConfig = function(type) {
+	
+	var color;
+	
+	if (type === 'success') {
+		color = 'green';
+	}
+	else if (type === 'fail') {
+		color = 'red';
+	}
+	else if (type === 'exception') {
+		color = 'red';
+	}
+	
+	// build a standard config
+	var cfg = {
+		endpoint: "Dot",
+		paintStyle: endpointPaintStyle,
+		isSource: true,
+		connector: [ "Flowchart", { stub: [30, 30], gap: 5, cornerRadius: 5, alwaysRespectStubs: true } ],
+		connectorStyle: {
+			lineWidth: 2,
+			strokeStyle: color,
+			joinstyle: "round"
+		},
+		hoverPaintStyle: {
+			fillStyle: color
+		},
+		connectorHoverStyle: {
+			fillStyle: color
+		},
+		dragOptions: {},
+		connectorOverlays: [
+		    [ "Arrow", { width : 8, length : 8, location : 1 } ]
+	    ]
+	};
+	
+	if (type === 'exception') {
+		cfg.connectorStyle.dashstyle = "2";
+	}
+	
+	// return the configuration
+	return cfg;
+};
 
-    },
-    exceptionEndpoint = {
-            endpoint: "Dot",
-            paintStyle: {
-                strokeStyle: "transparent",
-                fillStyle: "transparent",
-                radius: 7,
-                lineWidth: 2
-            },
-            isSource: true,
-            connector: [ "Flowchart", { stub: [30, 30], gap: 5, cornerRadius: 5, alwaysRespectStubs: true } ],
-            connectorStyle: {
-            	lineWidth: 2,
-            	strokeStyle: "red",
-            	joinstyle: "round",
-            	dashstyle: "2"
-            },
-            hoverPaintStyle: {
-            	strokeStyle: "red"
-            },
-            connectorHoverStyle: {
-            	fillStyle: "red"
-            },
-            dragOptions: {},
-            connectorOverlays: [
-                [ "Arrow", { width : 8, length : 8, location : 1 } ]
-            ]
-    },
-    targetEndpoint = {
-            endpoint: "Dot",
-            paintStyle: { fillStyle: 'transparent', radius: 7},
-            hoverPaintStyle: {fillStyle: 'transparent'},
-            maxConnections: -1,
-            dropOptions: { hoverClass: "hover", activeClass: "active" },
-            isTarget: true
-    };
+var targetEndpoint = {
+	endpoint: "Dot",
+	paintStyle: { fillStyle: 'transparent', radius: 7},
+	hoverPaintStyle: {fillStyle: 'transparent'},
+	maxConnections: -1,
+	dropOptions: { hoverClass: "hover", activeClass: "active" },
+	isTarget: true
+};
 
 
 
@@ -267,26 +273,30 @@ var _addEndpoints = function (toId, e) {
 	
 	if (e.success) {
         var successUUID = toId + e.success;
-        jsPlumb.addEndpoint(toId, successEndpoint, {
-            anchor: e.success, uuid: successUUID
+        jsPlumb.addEndpoint(toId, _endpointConfig('success'), {
+            anchor: e.success,
+            uuid: successUUID
         });
 	}
 	if (e.fail) {
         var failUUID = toId + e.fail;
-        jsPlumb.addEndpoint(toId, failEndpoint, {
-        	anchor: e.fail, uuid: failUUID
+        jsPlumb.addEndpoint(toId, _endpointConfig('fail'), {
+        	anchor: e.fail,
+        	uuid: failUUID
         });
 	}
 	if (e.exception) {
         var exceptUUID = toId + e.exception;
-        jsPlumb.addEndpoint(toId, exceptionEndpoint, {
-        	anchor: e.exception, uuid: exceptUUID
+        jsPlumb.addEndpoint(toId, _endpointConfig('exception'), {
+        	anchor: e.exception,
+        	uuid: exceptUUID
         });
 	}
 	if (e.target) {
         var targetUUID = toId + e.target;
         jsPlumb.addEndpoint(toId, targetEndpoint, {
-        	anchor: e.target, uuid: targetUUID
+        	anchor: e.target,
+        	uuid: targetUUID
         });
 	}
 };
@@ -307,7 +317,7 @@ var _updateMagnets = function(elements, container) {
 	
 	// create a new magnetizer
 	var magnet = new Magnetizer({
-		container : $('#' + container),
+		container : container,
 		getContainerPosition : function(c) {
 			return c.offset();
 		},
@@ -417,40 +427,29 @@ var _addStep = function(step, prev, position, size) {
 		at : 'bottom'
 	};
 	
-	// create a standard endpoint definition
-	endpoint = {
-		success: 'Right',
-		fail: 'Bottom',
-		exception: 'Top',
-		target: 'Left'
-	};
-
 	// look at the activity type and add the appropriate endpoints
 	// an styles
 	if (step.activity.type === 'start') {
-		itemClass = sizeClass + ' item startItem';
-		endpoint = { success: 'Right' };
+		endpoint = {
+			success: 'Right'
+				};
 	}
 	else if (step.activity.type === 'end') {
-		itemClass = sizeClass + ' item endItem';
-		end = step.id;
-		endpoint = { target: 'Left' };
-	}
-	else if (step.activity.type === 'task') {
-		itemClass = sizeClass + ' item taskItem';
-	}
-	else if (step.activity.type === 'condition') {
-		itemClass = sizeClass + ' item conditionItem';
-	}
-	else if (step.activity.type === 'loop') {
-		itemClass = sizeClass + ' item loopItem';
-	}
-	else if (step.activity.type === 'workflow') {
-		itemClass = sizeClass + ' item workflowItem';
+		endpoint = {
+			target: 'Left'
+		};
 	}
 	else {
-		itemClass = sizeClass + ' item';
+		endpoint = {
+			success: 'Right',
+			fail: 'Bottom',
+			exception: 'Top',
+			target: 'Left'
+		};
 	}
+	
+	// create an item class
+	itemClass = sizeClass + ' item ' + step.activity.type + 'Item';
 
 	
 	// create the html for the step
@@ -458,6 +457,7 @@ var _addStep = function(step, prev, position, size) {
 					'" wfItemLabel="' + step.label +
 					'" wfItemType="' + step.activity.type +
 					'" wfItemId="' + step.id +
+					'" wfActivity="' + step.activity.id +
 					'" class="' + sizeClass + ' connectable magnetized">' +
 					'    <div class="' + itemClass + '"></div>' +
 					'    <div id="itemlabel-' + newId + '" class="itemLabel">' +
@@ -485,8 +485,8 @@ var _addStep = function(step, prev, position, size) {
 	// add the endpoints and push the new id to the steps array
 	_addEndpoints(newId, endpoint);
 	$steps.push(newId);
-	_updateMagnets($steps, 'wf-workarea');
-	return $('#' + newId);
+	_updateMagnets($steps, $workarea);
+	return $newObj;
 };
 
 
@@ -504,28 +504,105 @@ var _addStep = function(step, prev, position, size) {
  * set up the workarea and viewport and add the initial nodes
  * 
  */
-var _addNodes = function(canvas, container, header, data, size) {
+var _addNodes = function(data, size) {
 
-	var prevElement, my, at, start, end;
-	var posObj = {};
+	var prevElement;
 	
 	// set the title
-	$('#' + header).html(data.name);
+	$header.html(data.name);
 	
 	// create the step divs and get the start/end ids
 	$.each(data.steps, function(index, step) {
 		prevElement = _addStep(step, prevElement, null, size);
+		data.steps[index].htmlId = prevElement.attr('id');
+	});
+};
+
+/**
+ * function to find the html id of a step
+ */
+var _findStep = function(id, data) {
+	for (var i = 0; i < data.steps.length; i++) {
+		if (data.steps[i].id === id) {
+			return data.steps[i].htmlId;
+		}
+	}
+	return null;
+};
+
+
+/**
+ * connect the nodes
+ */
+var _connectNodes = function(data) {
+	$.each(data.steps, function(index, step) {
+
+		// connect success
+		if (step.success && step.success !== step.id) {
+			jsPlumb.connect({
+				uuids:[
+				    step.htmlId + 'Right',
+				    _findStep(step.success, data) + 'Left'
+				]
+			});
+		}
+		
+		// connect fail
+		if (step.fail && step.fail !== step.id) {
+			jsPlumb.connect({
+				uuids:[
+				    step.htmlId + 'Bottom',
+				    _findStep(step.fail, data) + 'Left'
+				]
+			});
+		}
+		
+		// connect left
+		if (step.exception && step.exception !== step.id) {
+			jsPlumb.connect({
+				uuids:[
+				    step.htmlId + 'Top',
+				    _findStep(step.exception, data) + 'Left'
+				]
+			});
+		}
 	});
 };
 
 
+/**
+ * creates a new item
+ */
+var _newItem = function(path, body, step) {
+	
+	if (body.type === 'task') {
 
-
-
-
-
-
-
+        $.ajax({
+            url : path,
+            method : 'POST',
+            crossDomain : true,
+            headers : {
+                'Accept' : 'application/json'
+            },
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({
+            	label: body.label,
+            	activity: body.activity,
+            	workflow: body.workflow
+            })
+        })
+        .done(function(data, status, xhr) {
+        	step.attr('wfItemId', data.id);
+        	
+        	console.log(data, step);
+        })
+        .fail(function(xhr, status, err) {
+        	console.log('failed', xhr, status, err);
+        	step.remove();
+        });
+	}
+};
 
 
 
@@ -534,26 +611,43 @@ var _addNodes = function(canvas, container, header, data, size) {
 /**
  * initialize the canvas and set up the panzoom
  */
-var _initCanvas = function(container) {
+var _initCanvas = function() {
 	
-    $viewport.droppable({
+    jsPlumb.bind('beforeDrop', function(params) {
+        return params.sourceId !== params.targetId;
+    });
+	
+    $droparea.droppable({
         drop: function(e, ui) {
-            
-            var obj = {
+        	
+        	// remove the helper
+        	ui.helper.remove();
+        	
+        	// create the step
+        	var step = {
                 id: ui.draggable.attr('wfItemId'),
                 label: ui.draggable.attr('wfItemLabel'),
                 activity: {
                     type: ui.draggable.attr('wfItemType')
                 }
             };
-            _addStep(obj, null, ui.offset, $iconSize);
+        	
+        	// add the step to the workspace
+            var uiStep = _addStep(step, null, ui.offset, $iconSize);
+            
+            // create the step
+            _newItem('/api/wf/steps', {
+            	activity: ui.draggable.attr('wfActivity'),
+            	label: step.label,
+            	workflow: $wf.id,
+            	type: step.activity.type
+            }, uiStep);
         }
     });
-	
-	
+    
 	// set up panzoom with firefox compatibility
-	$panzoom = $('#' + container).panzoom();
-	
+	$panzoom = $workarea.panzoom();
+
 	// set up the scroll zoom
 	$panzoom.parent().on('mousewheel.focal DOMMouseScroll', function(e) {
 
@@ -569,7 +663,7 @@ var _initCanvas = function(container) {
 			// determine the delta
 			var delta = e.delta || e.originalEvent.wheelDelta || ffWheel;
 			var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
-			var dc = document.getElementById(container);
+			var dc = document.getElementById($workarea.attr('id'));
 			var offsetX = Math.abs(dc.offsetLeft) + e.originalEvent.clientX;
 			var offsetY = Math.abs(dc.offsetTop) + e.originalEvent.clientY;
 
@@ -583,7 +677,7 @@ var _initCanvas = function(container) {
 			$panzoom.panzoom('zoom', zoomOut, {
 				increment : 0.1,
 				animate : false,
-				silent : true,
+				silent : false,
 				focal : focal
 			});
 		}
@@ -596,19 +690,7 @@ var _initCanvas = function(container) {
  * position the workarea
  */
 var _positionWorkarea = function() {
-	// position the at the top left of the viewport
-	$('#wf-menu').position({
-		my : 'left top',
-		at : 'left top',
-		of : $('#wf-viewport')
-	});
 
-	// add the menu toggle
-	$('#wf-menuToggle').position({
-		my : 'left center',
-		at : 'left center',
-		of : $('#wf-viewport')
-	});
 	
 	// reposition the work area
 	$workarea.position({
@@ -616,6 +698,13 @@ var _positionWorkarea = function() {
 			$(this).css('top', -(fb.element.height / 2 ));
 			$(this).css('left', -(fb.element.width / 2 ));
 		},
+		of : $viewport
+	});
+	
+	// add the menu toggle
+	$menutoggle.position({
+		my : 'left center',
+		at : 'left center',
 		of : $viewport
 	});
 };
@@ -643,24 +732,41 @@ var _loadWorkflow = function(id) {
         jsPlumb.ready(function() {
 
             if (xhr.status === 200) {
-                // jsplumb everything
-                _addNodes('wf-viewport', 'wf-workarea', 'wf-header', data, $iconSize);
+            	$wf = data;
+                _addNodes(data, $iconSize);
+                _connectNodes(data);
             }
             else {
             	console.log(status);
             }
            
-            _initCanvas('wf-workarea');
-            jsPlumb.bind('beforeDrop', function(params) {
-                return params.sourceId !== params.targetId;
-            });
+            _initCanvas();
         });
     })
     .fail(function(xhr, status, err) {
-        console.log('ERROR', err);
+        console.log('FAIL', err);
+    })
+    .always(function() {
+    	_positionMenu();
     });
 };
 
+
+/**
+ * add new node html to menu
+ */
+var _menuNode = function(node) {
+	return 	'<li class="itemList">' +
+			'<div class="menuObject" ' +
+			'wfItemLabel="' + node.name + '" ' +
+			'wfItemType="' + node.type + '" ' +
+			'wfActivity="' + node.id + '" ' +
+			'wfItemId="">' +
+			'<div class="centered item-sm ' + node.type + 'Item"></div>' +
+			'<div class="itemListLabel">' + node.name + '</div>' +
+			'</div>' +
+			'</li>';
+};
 
 
 /**
@@ -668,6 +774,20 @@ var _loadWorkflow = function(id) {
  */
 var _loadMenuItems = function() {
 	
+	// condition
+	$('#generalObjects').append(_menuNode({
+		id: 'condition',
+		name: 'Condition',
+		type: 'condition'
+	}));
+	
+	// loop
+	$('#generalObjects').append(_menuNode({
+		id: 'loop',
+		name: 'Loop',
+		type: 'loop'
+	}));
+
     // get the activities
     $.ajax({
         url : '/api/wf/activitys?maxdepth=0',
@@ -683,14 +803,12 @@ var _loadMenuItems = function() {
         for (var i = 0; i < $activities.length; i++) {
             var a = $activities[i];
             if (a.type === 'end' || a.id === 'activity-log') {
-                $('#generalObjects').append('<li class="itemList"><div class="menuObject" wfItemLabel="' + a.name + '" wfItemType="' + a.type + '" wfItemId="' + a.id + '"><div class="centered item-sm ' + a.type + 'Item"></div><div class="itemListLabel">' + a.name + '</div></div></li>');
+            	$('#generalObjects').append(_menuNode(a));
             }
             if (a.type === 'task') {
-                $('#taskObjects').append('<li class="itemList"><div class="menuObject" wfItemLabel="' + a.name + '" wfItemType="' + a.type + '" wfItemId="' + a.id + '"><div class="centered item-sm ' + a.type + 'Item"></div><div class="itemListLabel">' + a.name + '</div></div></li>');
+            	$('#taskObjects').append(_menuNode(a));
             }
         }
-        $('#generalObjects').append('<li class="itemList"><div class="menuObject" wfItemLabel="Condition" wfItemType="condition" wfItemId="condition"><div class="centered item-sm conditionItem"></div><div class="itemListLabel">Condition</div></div></li>');
-        $('#generalObjects').append('<li class="itemList"><div class="menuObject" wfItemLabel="Loop" wfItemType="loop" wfItemId="loop"><div class="centered item-sm loopItem"></div><div class="itemListLabel">Loop</div></div></li>');
         
         
         // get the workflows
@@ -707,11 +825,16 @@ var _loadMenuItems = function() {
             
             for (var i = 0; i < $workflows.length; i++) {
                 var w = $workflows[i];
-                $('#workflowObjects').append('<li class="itemList"><div class="menuObject" wfItemLabel="' + w.name + '" wfItemType="workflow" wfItemId="' + w.id + '"><div class="centered item-sm workflowItem"></div><div class="itemListLabel">' + w.name + '</div></div></li>');
-                
+            	$('#workflowObjects').append(_menuNode({
+            		id: w.id,
+            		name: w.name,
+            		type: 'workflow'
+            	}));
             }
             
-            $('.menuObject').draggable({helper: 'clone', appendTo: '#wf-workarea', zIndex: 65100, containment:'#wf-viewport'});
+            // make the menu items draggable
+            _makeMenuDraggable();
+            
         })
         .fail(function(xhr, status, err) {
             console.log('ERROR', err);
@@ -737,7 +860,7 @@ $(document).ready(function() {
 	if (id) {
 	    _getObjects();
 	    _onEvents();
-    	_positionWorkarea();
+	    _positionWorkarea();
 	    _loadWorkflow(id);
 	    _loadMenuItems();
 	}

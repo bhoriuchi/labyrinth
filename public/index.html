@@ -97,20 +97,22 @@ body {
 					</div>
 				</div>
 			</div>
-			<img src="./img/chevrons.svg" class="rotate0" id="wf-menuToggle"
-				onClick="toggleMenu()">
-
-			<p id="wf-header" style="font-family: Verdana"></p>
+			<img src="./img/chevrons.svg" class="rotate0" id="wf-menuToggle" onClick="toggleMenu()">
+			<h3 id="wf-header"></h3>
 			<div id="wf-viewport">
 				<div id="wf-workarea"></div>
 			</div>
+                <div id="wf-droparea">test</div>
 
-
-
-
+            
+            <div id="wf-toolbar">
+                <span class="btn btn-default glyphicon glyphicon-floppy-save gi-25px"></span>
+                <br>
+                <span class="btn btn-default glyphicon glyphicon-refresh gi-25px" onClick="resetPanzoom()"></span>
+            </div>
+            
 			<p style="display:none;">
-				<a class="btn btn-primary btn-lg" href="#" role="button"
-					onClick="toggleMenu()">Show Menu &raquo;</a>
+				<a class="btn btn-primary btn-lg" href="#" role="button" onClick="toggleMenu()">Show Menu &raquo;</a>
 			</p>
 		</div>
 	</div>
