@@ -5,10 +5,23 @@
 /**
  * variables used through out
  */
-var $steps = [];
+var $steps = {};
+var $elements = [];
 var $menuLoaded, $activities, $workflows, $header, $toolbar, $wf;
 var $panzoom, $workarea, $viewport, $menu, $menutoggle, $iconSize;
-var $droparea;
+var $droparea, $editmodal, $edittabs, $codemirror, $codefield;
+
+var $editheight = 570;
+var $editwidth  = 750;
+var $activetab  = 0;
+
+// define endpoint locations
+var $conn = {
+	success: 'Right',
+	fail: 'Bottom',
+	exception: 'Top',
+	target: 'Left'
+};
 
 /**
  * gets url path param - http://stackoverflow.com/questions/11582512/how-to-get-url-parameters-with-javascript
@@ -25,6 +38,9 @@ var _getObjects = function() {
 	
 	// set the objects
     $menuLoaded = false;
+    $codefield  = document.getElementById('wf-tab-code');
+    $edittabs   = $('#wf-editTabs');
+    $editmodal	= $('#wf-editStep');
     $droparea   = $('#wf-droparea');
     $toolbar    = $('#wf-toolbar');
     $header     = $('#wf-header');
@@ -46,7 +62,7 @@ var resetPanzoom = function() {
 /**
  * position the menu in the viewport
  */
-var _positionMenu = function() {
+var _positionElements = function() {
     $menu.position({
         my: 'left top',
         at: 'left top',
@@ -66,6 +82,12 @@ var _positionMenu = function() {
 		at: 'right bottom',
 		of: $viewport
 	});
+	
+	$editmodal.dialog('option', 'position', {
+		my: 'center top+15%',
+		at: 'center top',
+		of: $(document)
+	});
 };
 
 /**
@@ -77,12 +99,39 @@ var _onEvents = function() {
 	$( window ).resize(function() {
 		var show = ($menu.css('display') === 'none') ? false : true;
 		if (show) {
-			_positionMenu();
+			_positionElements();
 		}
 		else {
 			$menu.show();
-            _positionMenu();
+            _positionElements();
            $menu.hide();
+		}
+	});
+	
+	// when a node is double clicked
+	$(document).on('dblclick', '.connectable', function() {
+		
+		// get the id
+		var id   = $(this)[0].id;
+		var step = $steps[id];
+		
+		console.log(step);
+		// open the dialog
+		if (!step.activity.readonly) {
+			if (step.activity && step.activity.source) {
+				$codemirror.setValue(step.activity.source);
+			}
+			else {
+				$codemirror.setValue('');
+			}
+			$('#wf-step-name').val(step.label);
+			$('#wf-step-timeout').val(step.timeout);
+			$('#wf-step-usecurrent').prop('checked', step.use_current);
+			$('#wf-step-failworkflow').prop('checked', step.failsWorkflow);
+			$('#wf-step-wait').prop('checked', step.waitOnSuccess);
+			$('#wf-step-requirekey').prop('checked', step.requireKey);
+			$editmodal.dialog('option', 'title', 'Edit Step - ' + step.label);
+			$editmodal.dialog('open');
 		}
 	});
 };
@@ -138,9 +187,10 @@ var toggleMenu = function() {
 
 var _makeMenuDraggable = function() {
     $('.menuObject').draggable({
+    	containment: '#wf-viewport',
     	helper: 'clone',
     	appendTo: 'body',
-    	zIndex: 65100,
+    	zIndex: 510,
     	revert: true,
     	revertDuration: 200
     });
@@ -431,20 +481,20 @@ var _addStep = function(step, prev, position, size) {
 	// an styles
 	if (step.activity.type === 'start') {
 		endpoint = {
-			success: 'Right'
+			success: $conn.success
 				};
 	}
 	else if (step.activity.type === 'end') {
 		endpoint = {
-			target: 'Left'
+			target: $conn.target
 		};
 	}
 	else {
 		endpoint = {
-			success: 'Right',
-			fail: 'Bottom',
-			exception: 'Top',
-			target: 'Left'
+			success: $conn.success,
+			fail: $conn.fail,
+			exception: $conn.exception,
+			target: $conn.target
 		};
 	}
 	
@@ -484,8 +534,11 @@ var _addStep = function(step, prev, position, size) {
 
 	// add the endpoints and push the new id to the steps array
 	_addEndpoints(newId, endpoint);
-	$steps.push(newId);
-	_updateMagnets($steps, $workarea);
+	$steps[newId] = step;
+	$elements.push(newId);
+	_updateMagnets($elements, $workarea);
+
+	// return the created object
 	return $newObj;
 };
 
@@ -541,8 +594,8 @@ var _connectNodes = function(data) {
 		if (step.success && step.success !== step.id) {
 			jsPlumb.connect({
 				uuids:[
-				    step.htmlId + 'Right',
-				    _findStep(step.success, data) + 'Left'
+				    step.htmlId + $conn.success,
+				    _findStep(step.success, data) + $conn.target
 				]
 			});
 		}
@@ -551,8 +604,8 @@ var _connectNodes = function(data) {
 		if (step.fail && step.fail !== step.id) {
 			jsPlumb.connect({
 				uuids:[
-				    step.htmlId + 'Bottom',
-				    _findStep(step.fail, data) + 'Left'
+				    step.htmlId + $conn.fail,
+				    _findStep(step.fail, data) + $conn.target
 				]
 			});
 		}
@@ -561,8 +614,8 @@ var _connectNodes = function(data) {
 		if (step.exception && step.exception !== step.id) {
 			jsPlumb.connect({
 				uuids:[
-				    step.htmlId + 'Top',
-				    _findStep(step.exception, data) + 'Left'
+				    step.htmlId + $conn.exception,
+				    _findStep(step.exception, data) + $conn.target
 				]
 			});
 		}
@@ -575,10 +628,30 @@ var _connectNodes = function(data) {
  */
 var _newItem = function(path, body, step) {
 	
-	if (body.type === 'task') {
+	var msg;
+	
+	var id       = step.attr('id');
 
+	
+	if (body.type === 'task') {
+		
+		if (body.activity === 'task') {
+			console.log('new task');
+		}
+		else {
+			msg = {
+				label: body.label,
+				activity: body.activity,
+				workflow: body.workflow
+			};
+		}
+	}
+	
+	
+	
+	if (msg) {
         $.ajax({
-            url : path,
+            url : path + '?maxdepth=0',
             method : 'POST',
             crossDomain : true,
             headers : {
@@ -586,21 +659,19 @@ var _newItem = function(path, body, step) {
             },
             dataType: 'json',
             contentType: 'application/json',
-            data: JSON.stringify({
-            	label: body.label,
-            	activity: body.activity,
-            	workflow: body.workflow
-            })
+            data: JSON.stringify(msg)
         })
         .done(function(data, status, xhr) {
         	step.attr('wfItemId', data.id);
-        	
-        	console.log(data, step);
+        	$steps[id] = data;
         })
         .fail(function(xhr, status, err) {
         	console.log('failed', xhr, status, err);
         	step.remove();
         });
+	}
+	else {
+		step.remove();
 	}
 };
 
@@ -612,10 +683,113 @@ var _newItem = function(path, body, step) {
  * initialize the canvas and set up the panzoom
  */
 var _initCanvas = function() {
+		
+	// create the edit dialog
+	$editmodal.dialog({
+		autoOpen: false,
+		height: $editheight,
+		width: $editwidth,
+		modal: true,
+		draggable: false,
+		position: {
+			my: 'center top+33%',
+			at: 'center top',
+			of: $(document)
+		},
+		buttons: {
+			OK: function() {
+				$( this ).dialog( "close" );
+			},
+			Apply: function() {
+				$( this ).dialog( "close" );
+			},
+			Cancel: function() {
+				$( this ).dialog( "close" );
+			}
+		}
+	});
 	
-    jsPlumb.bind('beforeDrop', function(params) {
-        return params.sourceId !== params.targetId;
+	// create the tabs
+	$edittabs.tabs({
+        activate: function(event, ui) {
+            $codemirror.refresh();
+            $activetab = $edittabs.tabs("option","active");
+        },
+        active: $edittabs.tabs({
+        	active: $activetab
+        })
+	});
+	
+	
+	$codemirror = CodeMirror.fromTextArea($codefield, {
+	    gutters: ["note-gutter", "CodeMirror-linenumbers"],
+	    lineNumbers: true,
+	    mode: 'javascript'
+	  });
+	
+	// add tool tips
+	$("body").tooltip({
+		selector: '[data-toggle=tooltip]',
+		position: {
+			my: "left+15 center",
+			at: "right center"
+		}
+	});
+	
+	/**
+	 * bind the jsPlumb events
+	 */
+	
+	// before a new connection is made
+    jsPlumb.bind('beforeDrop', function(info) {
+        return info.sourceId !== info.targetId;
     });
+    
+    // when a new connection is made
+    jsPlumb.bind('connection', function(info, event) {
+    	
+    	// get the connection type
+    	var type = info.sourceEndpoint.anchor.type;
+    	var source = info.source.id;
+    	var target = info.target.id;
+    	
+    	// connect the appropriate
+    	if (type === $conn.success) {
+    		$steps[source].success = $steps[target].id;
+    	}
+    	else if (type === $conn.fail) {
+    		$steps[source].fail = $steps[target].id;
+    	}
+    	else if (type === $conn.exception) {
+    		$steps[source].exception = $steps[target].id;
+    	}
+    });
+    
+    // when a connection is removed
+    jsPlumb.bind('connectionDetached', function(info, event) {
+    	
+    	// get the connection type
+    	var type = info.sourceEndpoint.anchor.type;
+    	var source = info.source.id;
+    	var target = info.target.id;
+    	
+    	// connect the appropriate
+    	if (type === $conn.success) {
+    		$steps[source].success = null;
+    	}
+    	else if (type === $conn.fail) {
+    		$steps[source].fail = null;
+    	}
+    	else if (type === $conn.exception) {
+    		$steps[source].exception = null;
+    	}
+    });
+    
+    
+    
+    
+    
+    
 	
     $droparea.droppable({
         drop: function(e, ui) {
@@ -730,24 +904,17 @@ var _loadWorkflow = function(id) {
         console.log(data, xhr, status);
         
         jsPlumb.ready(function() {
-
-            if (xhr.status === 200) {
-            	$wf = data;
-                _addNodes(data, $iconSize);
-                _connectNodes(data);
-            }
-            else {
-            	console.log(status);
-            }
-           
-            _initCanvas();
+        	$wf = data;
+            _addNodes(data, $iconSize);
+            _connectNodes(data);
+            _initCanvas(); 
         });
     })
     .fail(function(xhr, status, err) {
         console.log('FAIL', err);
     })
     .always(function() {
-    	_positionMenu();
+    	_positionElements();
     });
 };
 
@@ -787,6 +954,13 @@ var _loadMenuItems = function() {
 		name: 'Loop',
 		type: 'loop'
 	}));
+	
+	// new task
+	$('#generalObjects').append(_menuNode({
+		id: 'task',
+		name: 'Task',
+		type: 'task'
+	}));
 
     // get the activities
     $.ajax({
@@ -802,10 +976,10 @@ var _loadMenuItems = function() {
         
         for (var i = 0; i < $activities.length; i++) {
             var a = $activities[i];
-            if (a.type === 'end' || a.id === 'activity-log') {
+            if (a.type === 'end') {
             	$('#generalObjects').append(_menuNode(a));
             }
-            if (a.type === 'task') {
+            else if (a.type === 'task') {
             	$('#taskObjects').append(_menuNode(a));
             }
         }

@@ -128,6 +128,7 @@
 	"globals": {
 		"$": false,
 		"jsPlumb": false,
+		"CodeMirror": false,
 		"Magnetizer": false,
 		"document": false,
 		"window": false

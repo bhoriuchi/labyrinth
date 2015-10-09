@@ -26,6 +26,7 @@ body {
 </style>
 <link rel="stylesheet" type="text/css" href="./css/bootstrap-theme.min.css">
 <link rel="stylesheet" type="text/css" href="./css/jquery-ui-custom/jquery-ui.min.css">
+<link rel="stylesheet" type="text/css" href="./css/codemirror.css">
 <link rel="stylesheet" type="text/css" href="./css/main.css">
 <link rel="stylesheet" type="text/css" href="./css/workflow.css">
 
@@ -69,9 +70,9 @@ body {
 	</nav>
 
 	<!-- Main jumbotron for a primary marketing message or call to action -->
-	<div class="jumbotron">
+	<div id="wf-jumbotron" class="jumbotron">
 		<div class="container">
-			<div id="wf-menu" style="display: none;">
+			<div id="wf-menu">
 				<div id="itemSelect" style="height: 600px">
 					<h3>General</h3>
 					<div>
@@ -97,28 +98,70 @@ body {
 					</div>
 				</div>
 			</div>
-			<img src="./img/chevrons.svg" class="rotate0" id="wf-menuToggle" onClick="toggleMenu()">
 			<h3 id="wf-header"></h3>
 			<div id="wf-viewport">
 				<div id="wf-workarea"></div>
 			</div>
-                <div id="wf-droparea">test</div>
 
-            
+            <div id="wf-droparea"></div>
             <div id="wf-toolbar">
-                <span class="btn btn-default glyphicon glyphicon-floppy-save gi-25px"></span>
+                <span class="btn btn-default glyphicon glyphicon-floppy-save gi-md"></span>
                 <br>
-                <span class="btn btn-default glyphicon glyphicon-refresh gi-25px" onClick="resetPanzoom()"></span>
+                <span class="btn btn-default glyphicon glyphicon-refresh gi-md" onClick="resetPanzoom()"></span>
             </div>
+            <img src="./img/chevrons.svg" class="rotate0" id="wf-menuToggle" onClick="toggleMenu()">
+			<div id="wf-editStep" title="Edit Step" style="display:none;">
+				<div id="wf-editTabs">
+					<ul>
+						<li><a href="#wf-tab-general">General</a></li>
+						<li><a href="#wf-tab-input">Input</a></li>
+						<li><a href="#wf-tab-output">Output</a></li>
+						<li><a href="#wf-tab-source">Source</a></li>
+					</ul>
+					<div id="wf-tab-general">
+						<form>
+					  		<fieldset>
+								<div class="form-group">
+									<label for="wf-step-name" data-toggle="tooltip" title="The name of the step">Name:</label>
+									<input id="wf-step-name" type="text" name="wf-step-name" value="" class="form-control">
+								</div>
+								<div class="form-group">
+									<label for="wf-step-timeout" data-toggle="tooltip" title="Maximum runtime of task, 0 for no timeout">Timeout:</label>
+									<input id="wf-step-timeout" type="text" name="wf-step-timeout" value="" class="form-control">
+								</div>
+								<div class="checkbox">
+									<label data-toggle="tooltip" title="Always use the current version"><input id="wf-step-usecurrent" type="checkbox" value="">Use Current</label>
+								</div>
+								<div class="checkbox">
+									<label data-toggle="tooltip" title="Fail the entire workflow if this step fails"><input id="wf-step-failworkflow" type="checkbox" value="">Fail Workflow</label>
+								</div>
+								<div class="checkbox">
+									<label data-toggle="tooltip" title="Do not proceed to the next step on completion"><input id="wf-step-wait" type="checkbox" value="">Wait On Success</label>
+								</div>
+								<div class="checkbox">
+									<label data-toggle="tooltip" title="Require a run key to move to the next step"><input id="wf-step-requirekey" type="checkbox" value="">Require Key</label>
+								</div>
+					  		</fieldset>
+						</form>
+					</div>
+					<div id="wf-tab-input"></div>
+					<div id="wf-tab-output"></div>
+					<div id="wf-tab-source">
+						<textarea id="wf-tab-code"></textarea>
+					</div>
+				</div>
+			</div>
             
+            <!--
 			<p style="display:none;">
 				<a class="btn btn-primary btn-lg" href="#" role="button" onClick="toggleMenu()">Show Menu &raquo;</a>
 			</p>
+			-->
 		</div>
 	</div>
 
+<!--
 	<div class="container" style="display:none;">
-		<!-- Example row of columns -->
 		<div class="row">
 			<div class="col-md-4">
 				<h2>Heading</h2>
@@ -161,9 +204,9 @@ body {
 			<p>&copy; Company 2015</p>
 		</footer>
 	</div>
+-->
 	<!-- /container -->
-	<script
-		src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> -->
 	<script>
 		window.jQuery || document.write('<script src="./js/vendor/jquery-1.11.2.min.js"><\/script>')
 	</script>
@@ -174,6 +217,8 @@ body {
 	<script src="./js/vendor/farahey-0.5.js"></script>
 	<script src="./js/vendor/jsPlumb-1.7.9-min.js"></script>
 	<script src="./js/vendor/jquery.panzoom-2.0.5.js"></script>
+	<script src="./js/vendor/codemirror.js"></script>
+	<script src="./js/vendor/codemirror-js.js"></script>
 	<script src="./js/workflow.js"></script>
 	<script src="./js/main.js"></script>
 

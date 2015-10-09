@@ -15,7 +15,7 @@ div.item-lg {
 }
 
 div.connectable {
-	z-index: 32500;
+	z-index: 250;
 	position: absolute;
 	border: 0px;
 	overflow: visible;
@@ -65,7 +65,7 @@ div.item {
 }
 
 div.itemLabel {
-	z-index: 32500;
+	z-index: 250;
     text-shadow: 3px 3px 0 #fcfcfc, -1px 0 #fcfcfc, 0 1px #fcfcfc, 1px 0 #fcfcfc, 0 -1px #fcfcfc;
 	position: relative;
 	font-family: Arial;
@@ -137,6 +137,108 @@ div.startItem, div.endItem p {
     cursor: pointer;
 }
 
+.CodeMirror {
+  border: 1px solid #eee;
+  height: 400px;
+}
+
+.ui-tooltip {
+	border-radius: 10px;
+    background: #666;
+    color: white;
+    border: none;
+    padding: 0;
+    opacity: 1;
+}
+.ui-tooltip-content {
+    position: relative;
+    padding: 1em;
+}
+/*
+.ui-tooltip-content::after {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    display: block;
+    width: 0;
+    top: 18px;
+    left: -10px;
+    border-color: transparent #666;
+    border-width: 10px 10px 10px 0;
+}
+*/
+
+.ui-dialog{
+	position:absolute;
+	top:70px;
+	left:600px;
+	z-index:1011;
+	padding: 0;
+}
+.ui-widget-overlay{
+	z-index:1010;
+}
+.ui-dialog-titlebar {
+	background: #666666;
+	color: #fff;
+	padding: 2px;
+	border: 0px;
+}
+
+.ui-dialog-title {
+	font-family:Verdana;
+	font-size: 13px;
+	font-weight:normal;
+}
+.ui-dialog-content {
+	font-family: Verdana;
+	font-size: 11px;
+	padding: 0;
+}
+.ui-button-text {
+    font-size: 10px;
+}
+.ui-tabs ul li a
+{
+    outline-width: 0;
+}​
+.ui-tabs .ui-tabs-panel {
+    padding: 0;
+}
+#wf-editStep {
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+
+
+#wf-editTabs { 
+    background: transparent; 
+    border: none;
+    padding: 0;
+} 
+#wf-editTabs .ui-widget-header { 
+    background: transparent; 
+    border: none; 
+    border-bottom: 1px solid #c0c0c0; 
+    -moz-border-radius: 0px; 
+    -webkit-border-radius: 0px; 
+    border-radius: 0px; 
+} 
+#wf-editTabs .ui-tabs-nav .ui-state-default { 
+    background: transparent; 
+    border: none; 
+} 
+#wf-editTabs .ui-tabs-nav .ui-state-active { 
+    background: transparent url(../img/uiTabsArrow.png) no-repeat bottom center; 
+    border: none; 
+} 
+#wf-editTabs .ui-tabs-nav .ui-state-default a { 
+    color: #000000; 
+} 
+#wf-editTabs .ui-tabs-nav .ui-state-active a { 
+    color: #337ab7;
+    font-weight: bold;
+}
 
 .rotate180 {
 	-ms-transform: rotate(180deg);
@@ -149,8 +251,8 @@ div.startItem, div.endItem p {
 	transform: rotate(0deg);
 }
 
-.gi-25px {
-	font-size: 25px;
+.gi-md {
+	font-size: 15px;
 }
 
 
@@ -159,10 +261,30 @@ div.startItem, div.endItem p {
 	width: 10000px;
 	height: 10000px;
 	position: relative;
-	background-color: #fcfcfc;
+	background-color:#fcfcfc;
+	/*
+	background-image: linear-gradient(#e3e3e3 1px, transparent 1px),
+	linear-gradient(90deg, #e3e3e3 1px, transparent 1px),
+	linear-gradient(rgba(227,227,227,.3) 1px, transparent 1px),
+	linear-gradient(90deg, rgba(227,227,227,.3) 1px, transparent 1px);
+	background-size:100px 100px, 100px 100px, 20px 20px, 20px 20px;
+	*/
+}
+
+.longTextfield {
+	width: 500px;
+}
+
+.formTable {
+	width: 100%;
+}
+.formTable td {
+	padding: 5px;
 }
 
 #wf-header {
+	margin-top: 0px;
+	padding: 0px;
 	font-family: Verdana
 	font-size: 100px;
 }
@@ -174,11 +296,13 @@ div.startItem, div.endItem p {
 	outline: 1px solid #cccccc;
 	border-radius: 2px;
 	position: relative;
-	background-color: transparent;
+	background: transparent;
 }
 
 #wf-droparea {
-	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
 	z-index: -1;
 	height: 600px;
 	width: 20px;
@@ -186,8 +310,11 @@ div.startItem, div.endItem p {
 }
 
 #wf-menu {
+	top: 0;
+	left: 0;
+	display: none;
 	position: absolute;
-	z-index:65000;
+	z-index:500;
 	width: 300px;
 	height: 600px;
 	padding: 1px;
@@ -197,15 +324,19 @@ div.startItem, div.endItem p {
 
 
 #wf-toolbar {
+	top: 0;
+	left: 0;
 	display: none;
-    z-index: 65001;
+    z-index: 501;
     position: absolute;
     padding: 10px;
 }
 
 #wf-menuToggle {
+	top: 0;
+	left: 0;
 	padding: 2px;
-	z-index:65000;
+	z-index:500;
 	width: 20px;
 	height: 20px;
 	cursor: context-menu;
