@@ -139,7 +139,7 @@ div.startItem, div.endItem p {
 
 .CodeMirror {
   border: 1px solid #eee;
-  height: 400px;
+  height: 425px;
 }
 
 .ui-tooltip {
@@ -149,24 +149,24 @@ div.startItem, div.endItem p {
     border: none;
     padding: 0;
     opacity: 1;
+    max-width: 400px;
 }
 .ui-tooltip-content {
     position: relative;
     padding: 1em;
+    font-size: 12px;
 }
-/*
 .ui-tooltip-content::after {
     content: '';
     position: absolute;
     border-style: solid;
     display: block;
     width: 0;
-    top: 18px;
+    top: 10px;
     left: -10px;
     border-color: transparent #666;
     border-width: 10px 10px 10px 0;
 }
-*/
 
 .ui-dialog{
 	position:absolute;
@@ -210,6 +210,7 @@ div.startItem, div.endItem p {
 	overflow-x: hidden;
 }
 
+.new-param {}
 
 #wf-editTabs { 
     background: transparent; 
@@ -235,9 +236,17 @@ div.startItem, div.endItem p {
 #wf-editTabs .ui-tabs-nav .ui-state-default a { 
     color: #000000; 
 } 
-#wf-editTabs .ui-tabs-nav .ui-state-active a { 
+#wf-editTabs .ui-tabs-nav .ui-state-active a {
+	padding-bottom: 10px;
     color: #337ab7;
-    font-weight: bold;
+    /* font-weight: bold; */
+}
+
+.ctxicon {
+	min-height: 18px;
+	list-style-type: none;
+	background-repeat: no-repeat;
+	background-position: 4px 2px;
 }
 
 .rotate180 {
@@ -271,8 +280,8 @@ div.startItem, div.endItem p {
 	*/
 }
 
-.longTextfield {
-	width: 500px;
+.shortTextField {
+	width: 110px;
 }
 
 .formTable {

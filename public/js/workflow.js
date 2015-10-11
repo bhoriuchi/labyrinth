@@ -6,6 +6,9 @@
  * variables used through out
  */
 var $steps = {};
+var $attributes = [];
+var $inputs = [];
+var $outputs = [];
 var $elements = [];
 var $menuLoaded, $activities, $workflows, $header, $toolbar, $wf;
 var $panzoom, $workarea, $viewport, $menu, $menutoggle, $iconSize;
@@ -28,6 +31,51 @@ var $conn = {
  */
 var getURLParameter = function(name) {
 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(document.location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+};
+
+$.pluck = function(arr, key) { 
+    return $.map(arr, function(e) {
+    	return e[key];
+    });
+};
+
+
+var _editStep = function(id) {
+	
+	// get the step
+	var step = $steps[id];
+
+	// open the dialog
+	if (!step.activity.readonly) {
+		if (step.activity && step.activity.source) {
+			$codemirror.setValue(step.activity.source);
+		}
+		else {
+			$codemirror.setValue('');
+		}
+		
+		
+		// set the form values
+		$('#wf-step-name').val(step.label);
+		$('#wf-step-timeout').val(step.timeout);
+		$('#wf-step-usecurrent').prop('checked', step.use_current);
+		$('#wf-step-failworkflow').prop('checked', step.failsWorkflow);
+		$('#wf-step-wait').prop('checked', step.waitOnSuccess);
+		$('#wf-step-requirekey').prop('checked', step.requireKey);
+		
+		// determine if fields need to be hidden
+		if (step.waitOnSuccess) {
+			$('#wf-step-requirekey-form').show();
+		}
+		else {
+			$('#wf-step-requirekey').prop('checked', false);
+			$('#wf-step-requirekey-form').hide();
+		}
+		
+		
+		$editmodal.dialog('option', 'title', 'Edit Step - ' + step.label);
+		$editmodal.dialog('open');
+	}
 };
 
 
@@ -108,31 +156,62 @@ var _onEvents = function() {
 		}
 	});
 	
+	
+	$('#wf-step-wait').on('change', function() {
+		if ($(this).prop('checked')) {
+			$('#wf-step-requirekey-form').fadeIn();
+		}
+		else {
+			$('#wf-step-requirekey-form').fadeOut(function() {
+				$('#wf-step-requirekey').prop('checked', false);
+			});
+			
+		}
+	});
+	
+	
+	$('.new-param').on('click', function() {
+		var type = $(this).attr('wfParamType');
+		if (type === 'attribute') {
+			$('#wf-attributes-list').jsGrid('insertItem');
+		}
+		else if (type === 'input') {
+			$('#wf-input-list').jsGrid('insertItem');
+		}
+		else if (type === 'output') {
+			$('#wf-output-list').jsGrid('insertItem');
+		}
+	});
+	
+	$.contextMenu({
+        selector: '.connectable', 
+        callback: function(key, options) {
+        	if (key === 'edit') {
+        		_editStep(options.$trigger.attr('id'));
+        	}
+        	else if (key === 'delete') {
+        		options.$trigger.remove();
+        	}
+        },
+        items: {
+            'edit': {
+            	name: 'Edit',
+            	icon: 'edit'
+            },
+            'delete': {
+            	name: 'Delete',
+            	icon: 'delete'
+            }
+        }
+    });
+	
+	
 	// when a node is double clicked
 	$(document).on('dblclick', '.connectable', function() {
 		
 		// get the id
 		var id   = $(this)[0].id;
-		var step = $steps[id];
-		
-		console.log(step);
-		// open the dialog
-		if (!step.activity.readonly) {
-			if (step.activity && step.activity.source) {
-				$codemirror.setValue(step.activity.source);
-			}
-			else {
-				$codemirror.setValue('');
-			}
-			$('#wf-step-name').val(step.label);
-			$('#wf-step-timeout').val(step.timeout);
-			$('#wf-step-usecurrent').prop('checked', step.use_current);
-			$('#wf-step-failworkflow').prop('checked', step.failsWorkflow);
-			$('#wf-step-wait').prop('checked', step.waitOnSuccess);
-			$('#wf-step-requirekey').prop('checked', step.requireKey);
-			$editmodal.dialog('option', 'title', 'Edit Step - ' + step.label);
-			$editmodal.dialog('open');
-		}
+		_editStep(id);
 	});
 };
 
@@ -676,8 +755,24 @@ var _newItem = function(path, body, step) {
 };
 
 
+var _ioParameters = function() {
+	return [
+	    { name: 'name', type: 'text' },
+	    { name: 'type', type: 'text' },
+	    { name: 'mapAttribute', type: 'select', items: ['None'].concat($.pluck($attributes, 'name')) },
+	    { name: 'description', type: 'text' },
+	    { type: 'control' }
+    ];
+};
 
 
+var _removeBlanks = function(obj) {
+	for (var i = obj.length - 1; i >= 0; i--) {
+		if (!obj[i].name || obj[i].name === '') {
+			obj.splice(i, 1);
+		}
+	}
+};
 
 /**
  * initialize the canvas and set up the panzoom
@@ -696,23 +791,47 @@ var _initCanvas = function() {
 			at: 'center top',
 			of: $(document)
 		},
-		buttons: {
-			OK: function() {
-				$( this ).dialog( "close" );
-			},
-			Apply: function() {
-				$( this ).dialog( "close" );
-			},
-			Cancel: function() {
-				$( this ).dialog( "close" );
-			}
-		}
+		buttons: [
+		    {
+		    	text: 'OK',
+		    	click: function() {
+					$( this ).dialog( "close" );
+				}
+		    },
+		    {
+		    	text: 'Apply',
+		    	click: function() {
+					$( this ).dialog( "close" );
+				}
+		    },
+		    {
+		    	text: 'Cancel',
+		    	click: function() {
+					$( this ).dialog( "close" );
+				}
+		    },
+		]
 	});
 	
 	// create the tabs
 	$edittabs.tabs({
         activate: function(event, ui) {
-            $codemirror.refresh();
+            if (ui.newPanel.attr('id') === 'wf-tab-attributes') {
+            	_removeBlanks($attributes);
+            	$("#wf-attributes-list").jsGrid("render");
+            }
+            else if (ui.newPanel.attr('id') === 'wf-tab-input') {
+            	_removeBlanks($inputs);
+            	$("#wf-input-list").jsGrid("render");
+            }
+            else if (ui.newPanel.attr('id') === 'wf-tab-output') {
+            	_removeBlanks($outputs);
+            	$("#wf-output-list").jsGrid("render");
+            }
+            else if (ui.newPanel.attr('id') === 'wf-tab-source') {
+            	$codemirror.refresh();
+            }
+            
             $activetab = $edittabs.tabs("option","active");
         },
         active: $edittabs.tabs({
@@ -725,7 +844,7 @@ var _initCanvas = function() {
 	    gutters: ["note-gutter", "CodeMirror-linenumbers"],
 	    lineNumbers: true,
 	    mode: 'javascript'
-	  });
+	});
 	
 	// add tool tips
 	$("body").tooltip({
@@ -733,7 +852,58 @@ var _initCanvas = function() {
 		position: {
 			my: "left+15 center",
 			at: "right center"
+		},
+		show: {
+			delay: 500
 		}
+	});
+	
+	$("#wf-attributes-list").jsGrid({
+	    width: "100%",
+	    height: "395px",
+	    editing: true,
+	    autoload: true,
+	    data: $attributes,
+	    onItemUpdated: function(update) {
+	    	$("#wf-input-list").jsGrid('option', 'fields', _ioParameters());
+	    	$("#wf-output-list").jsGrid('option', 'fields', _ioParameters());
+	    },
+	    onItemInserted: function(insert) {
+	    	$("#wf-attributes-list").jsGrid('editItem', insert.item);
+	    	console.log($attributes);
+	    },
+	    fields: [
+	        { name: 'name', type: 'text' },
+	        { name: 'type', type: 'text' },
+	        { name: 'defaultValue', type: 'text' },
+	        { name: 'description', type: 'text' },
+	        { type: 'control' }
+	    ]
+	});
+	
+	$("#wf-input-list").jsGrid({
+	    width: "100%",
+	    height: "395px",
+	    editing: true,
+	    autoload: true,
+	    data: $inputs,
+	    onItemInserted: function(insert) {
+	    	$("#wf-input-list").jsGrid('editItem', insert.item);
+	    },
+	    fields: _ioParameters()
+	});
+	
+	
+	$("#wf-output-list").jsGrid({
+	    width: "100%",
+	    height: "395px",
+	    editing: true,
+	    autoload: true,
+	    data: $outputs,
+	    onItemInserted: function(insert) {
+	    	$("#wf-output-list").jsGrid('editItem', insert.item);
+	    },
+	    fields: _ioParameters()
 	});
 	
 	/**
@@ -903,6 +1073,20 @@ var _loadWorkflow = function(id) {
     .done(function(data, status, xhr) {
         console.log(data, xhr, status);
         
+        // split up the parameters
+        $.each(data.parameters, function(idx, val) {
+        	if (val.scope === 'attribute') {
+        		$attributes.push(val);
+        	}
+        	else if (val.scope === 'input') {
+        		$inputs.push(val);
+        	}
+        	else if (val.scope === 'output') {
+        		$outputs.push(val);
+        	}
+        });
+        
+        // wait for jsPlumb to be ready
         jsPlumb.ready(function() {
         	$wf = data;
             _addNodes(data, $iconSize);

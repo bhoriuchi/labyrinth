@@ -27,6 +27,9 @@ body {
 <link rel="stylesheet" type="text/css" href="./css/bootstrap-theme.min.css">
 <link rel="stylesheet" type="text/css" href="./css/jquery-ui-custom/jquery-ui.min.css">
 <link rel="stylesheet" type="text/css" href="./css/codemirror.css">
+<link rel="stylesheet" type="text/css" href="./css/jquery.contextMenu.css">
+<link rel="stylesheet" type="text/css" href="./css/jsgrid.min.css">
+<link rel="stylesheet" type="text/css" href="./css/jsgrid-theme.min.css">
 <link rel="stylesheet" type="text/css" href="./css/main.css">
 <link rel="stylesheet" type="text/css" href="./css/workflow.css">
 
@@ -114,38 +117,76 @@ body {
 				<div id="wf-editTabs">
 					<ul>
 						<li><a href="#wf-tab-general">General</a></li>
+						<li><a href="#wf-tab-attributes">Attributes</a></li>
 						<li><a href="#wf-tab-input">Input</a></li>
 						<li><a href="#wf-tab-output">Output</a></li>
 						<li><a href="#wf-tab-source">Source</a></li>
 					</ul>
 					<div id="wf-tab-general">
-						<form>
-					  		<fieldset>
-								<div class="form-group">
-									<label for="wf-step-name" data-toggle="tooltip" title="The name of the step">Name:</label>
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label for="wf-step-name" data-toggle="tooltip" title="The name of the step" class="control-label col-xs-2">Name:</label>
+								<div class="col-xs-10">
 									<input id="wf-step-name" type="text" name="wf-step-name" value="" class="form-control">
 								</div>
-								<div class="form-group">
-									<label for="wf-step-timeout" data-toggle="tooltip" title="Maximum runtime of task, 0 for no timeout">Timeout:</label>
-									<input id="wf-step-timeout" type="text" name="wf-step-timeout" value="" class="form-control">
+							</div>
+							<div class="form-group">
+								<label for="wf-step-timeout" data-toggle="tooltip" title="Maximum runtime of task in milliseconds; 0 for no timeout" class="control-label col-xs-2">Timeout (ms):</label>
+								<div class="col-xs-10">
+									<input id="wf-step-timeout" type="text" name="wf-step-timeout" value="" class="form-control shortTextField">
 								</div>
-								<div class="checkbox">
-									<label data-toggle="tooltip" title="Always use the current version"><input id="wf-step-usecurrent" type="checkbox" value="">Use Current</label>
+							</div>
+							<div class="form-group">
+								<div class="col-xs-offset-2 col-xs-10">
+									<div class="checkbox">
+										<label data-toggle="tooltip" title="Always use the current version"><input id="wf-step-usecurrent" type="checkbox" value="">Use Current</label>
+									</div>
 								</div>
-								<div class="checkbox">
-									<label data-toggle="tooltip" title="Fail the entire workflow if this step fails"><input id="wf-step-failworkflow" type="checkbox" value="">Fail Workflow</label>
+							</div>
+							<div class="form-group">
+								<div class="col-xs-offset-2 col-xs-10">
+									<div class="checkbox">
+										<label data-toggle="tooltip" title="Fail the entire workflow if this step fails"><input id="wf-step-failworkflow" type="checkbox" value="">Fail Workflow</label>
+									</div>
 								</div>
-								<div class="checkbox">
-									<label data-toggle="tooltip" title="Do not proceed to the next step on completion"><input id="wf-step-wait" type="checkbox" value="">Wait On Success</label>
+							</div>
+							<div class="form-group">
+								<div class="col-xs-offset-2 col-xs-10">
+									<div class="checkbox">
+										<label data-toggle="tooltip" title="Do not proceed to the next step on completion"><input id="wf-step-wait" type="checkbox" value="">Wait On Success</label>
+									</div>
 								</div>
-								<div class="checkbox">
-									<label data-toggle="tooltip" title="Require a run key to move to the next step"><input id="wf-step-requirekey" type="checkbox" value="">Require Key</label>
+							</div>
+							<div class="form-group" id="wf-step-requirekey-form">
+								<div class="col-xs-offset-2 col-xs-10">
+									<div class="checkbox">
+										<label data-toggle="tooltip" title="Require a run key to move to the next step"><input id="wf-step-requirekey" type="checkbox" value="">Require Key</label>
+									</div>
 								</div>
-					  		</fieldset>
+							</div>
 						</form>
 					</div>
-					<div id="wf-tab-input"></div>
-					<div id="wf-tab-output"></div>
+					<div id="wf-tab-attributes">
+						<a href="#" wfParamType="attribute" class="btn btn-default btn-xs new-param" style="float:right;">
+							<span class="glyphicon glyphicon-plus"></span> New Attribute
+						</a>
+						<br><br>
+						<div id="wf-attributes-list"></div>
+					</div>
+					<div id="wf-tab-input">
+						<a href="#" wfParamType="input" class="btn btn-default btn-xs new-param" style="float:right;">
+							<span class="glyphicon glyphicon-plus"></span> New Input
+						</a>
+						<br><br>
+						<div id="wf-input-list"></div>
+					</div>
+					<div id="wf-tab-output">
+						<a href="#" wfParamType="output" class="btn btn-default btn-xs new-param" style="float:right;">
+							<span class="glyphicon glyphicon-plus"></span> New Output
+						</a>
+						<br><br>
+						<div id="wf-output-list"></div>
+					</div>
 					<div id="wf-tab-source">
 						<textarea id="wf-tab-code"></textarea>
 					</div>
@@ -219,6 +260,8 @@ body {
 	<script src="./js/vendor/jquery.panzoom-2.0.5.js"></script>
 	<script src="./js/vendor/codemirror.js"></script>
 	<script src="./js/vendor/codemirror-js.js"></script>
+	<script src="./js/vendor/jquery.contextMenu.js"></script>
+	<script src="./js/vendor/jsgrid.min.js"></script>
 	<script src="./js/workflow.js"></script>
 	<script src="./js/main.js"></script>
 
