@@ -108,16 +108,47 @@ body {
 
             <div id="wf-droparea"></div>
             <div id="wf-toolbar">
-                <span class="btn btn-default glyphicon glyphicon-floppy-save gi-md"></span>
-                <br>
-                <span class="btn btn-default glyphicon glyphicon-refresh gi-md" onClick="resetPanzoom()"></span>
+            	<span class="btn btn-default glyphicon glyphicon-pencil gi-md" onClick="editWorkflow()" data-toggle="tooltip" title="Edit workflow properties"></span>
+                <span class="btn btn-default glyphicon glyphicon-floppy-save gi-md" data-toggle="tooltip" title="Save workflow changes"></span>
+                <span class="btn btn-default glyphicon glyphicon-refresh gi-md" onClick="resetPanzoom()" data-toggle="tooltip" title="Reset pan and zoom"></span>
             </div>
-            <img src="./img/chevrons.svg" class="rotate0" id="wf-menuToggle" onClick="toggleMenu()">
-			<div id="wf-editStep" title="Edit Step" style="display:none;">
+            <img src="./img/chevrons.svg" class="rotate0" id="wf-menuToggle" onClick="toggleMenu()" data-toggle="tooltip" title="Workflow menu">
+            
+            <div id="wf-edit-workflow" title="Edit Workflow" style="display: none;">
+            	<br><br>
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="wf-wf-name" data-toggle="tooltip" title="The name of the workflow" class="control-label col-xs-2">Name:</label>
+						<div class="col-xs-10">
+							<input id="wf-wf-name" type="text" name="wf-wf-name" value="" class="form-control">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="wf-wf-description" data-toggle="tooltip" title="Optional workflow description" class="control-label col-xs-2">Description:</label>
+						<div class="col-xs-10">
+							<input id="wf-wf-description" type="text" name="wf-wf-description" value="" class="form-control">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-xs-offset-2 col-xs-10">
+							<div class="checkbox">
+								<label data-toggle="tooltip" title="Always use the current version"><input id="wf-wf-usecurrent" type="checkbox" value="">Use Current</label>
+							</div>
+						</div>
+					</div>
+				</form>
+				<label for="wf-attributes-list">Attributes:</label>
+				<a href="#" wfParamType="attribute" class="btn btn-default btn-xs new-param" style="float:right;">
+					<span class="glyphicon glyphicon-plus"></span> New Attribute
+				</a>
+				<div id="wf-attributes-list"></div>
+            </div>
+            
+            
+			<div id="wf-edit-step" title="Edit Step" style="display:none;">
 				<div id="wf-editTabs">
 					<ul>
 						<li><a href="#wf-tab-general">General</a></li>
-						<li><a href="#wf-tab-attributes">Attributes</a></li>
 						<li><a href="#wf-tab-input">Input</a></li>
 						<li><a href="#wf-tab-output">Output</a></li>
 						<li><a href="#wf-tab-source">Source</a></li>
@@ -166,25 +197,16 @@ body {
 							</div>
 						</form>
 					</div>
-					<div id="wf-tab-attributes">
-						<a href="#" wfParamType="attribute" class="btn btn-default btn-xs new-param" style="float:right;">
-							<span class="glyphicon glyphicon-plus"></span> New Attribute
-						</a>
-						<br><br>
-						<div id="wf-attributes-list"></div>
-					</div>
 					<div id="wf-tab-input">
 						<a href="#" wfParamType="input" class="btn btn-default btn-xs new-param" style="float:right;">
 							<span class="glyphicon glyphicon-plus"></span> New Input
 						</a>
-						<br><br>
 						<div id="wf-input-list"></div>
 					</div>
 					<div id="wf-tab-output">
 						<a href="#" wfParamType="output" class="btn btn-default btn-xs new-param" style="float:right;">
 							<span class="glyphicon glyphicon-plus"></span> New Output
 						</a>
-						<br><br>
 						<div id="wf-output-list"></div>
 					</div>
 					<div id="wf-tab-source">

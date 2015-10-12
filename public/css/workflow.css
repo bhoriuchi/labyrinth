@@ -156,13 +156,15 @@ div.startItem, div.endItem p {
     padding: 1em;
     font-size: 12px;
 }
+
+
 .ui-tooltip-content::after {
     content: '';
     position: absolute;
     border-style: solid;
     display: block;
     width: 0;
-    top: 10px;
+   	top: 10px;
     left: -10px;
     border-color: transparent #666;
     border-width: 10px 10px 10px 0;
@@ -205,12 +207,15 @@ div.startItem, div.endItem p {
 .ui-tabs .ui-tabs-panel {
     padding: 0;
 }
-#wf-editStep {
+#wf-edit-step, #wf-edit-workflow {
 	overflow-y: hidden;
 	overflow-x: hidden;
 }
 
-.new-param {}
+
+.new-param {
+	margin-bottom: 8px;
+}
 
 #wf-editTabs { 
     background: transparent; 

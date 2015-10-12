@@ -13,10 +13,12 @@ var $elements = [];
 var $menuLoaded, $activities, $workflows, $header, $toolbar, $wf;
 var $panzoom, $workarea, $viewport, $menu, $menutoggle, $iconSize;
 var $droparea, $editmodal, $edittabs, $codemirror, $codefield;
+var $wfmodal;
 
 var $editheight = 570;
 var $editwidth  = 750;
 var $activetab  = 0;
+var $modaltop   = '+15%';
 
 // define endpoint locations
 var $conn = {
@@ -37,6 +39,26 @@ $.pluck = function(arr, key) {
     return $.map(arr, function(e) {
     	return e[key];
     });
+};
+
+var _removeBlanks = function(obj) {
+	for (var i = obj.length - 1; i >= 0; i--) {
+		if (!obj[i].name || obj[i].name === '') {
+			obj.splice(i, 1);
+		}
+	}
+};
+
+var editWorkflow = function() {
+	
+	_removeBlanks($attributes);
+	$('#wf-wf-name').val($wf.name);
+	$('#wf-wf-description').val($wf.description);
+	$('#wf-wf-usecurrent').prop('checked', $wf.use_current);
+	
+	$wfmodal.dialog('option', 'title', 'Edit Workflow - ' + $wf.name);
+	$wfmodal.dialog('open');
+	$("#wf-attributes-list").jsGrid("render");
 };
 
 
@@ -88,7 +110,8 @@ var _getObjects = function() {
     $menuLoaded = false;
     $codefield  = document.getElementById('wf-tab-code');
     $edittabs   = $('#wf-editTabs');
-    $editmodal	= $('#wf-editStep');
+    $editmodal	= $('#wf-edit-step');
+    $wfmodal    = $('#wf-edit-workflow');
     $droparea   = $('#wf-droparea');
     $toolbar    = $('#wf-toolbar');
     $header     = $('#wf-header');
@@ -118,8 +141,8 @@ var _positionElements = function() {
     });
     
 	$toolbar.show().position({
-		my: 'right bottom',
-		at: 'right bottom',
+		my: 'center bottom',
+		at: 'center bottom',
 		of: $viewport
 	});
 	
@@ -132,7 +155,13 @@ var _positionElements = function() {
 	});
 	
 	$editmodal.dialog('option', 'position', {
-		my: 'center top+15%',
+		my: 'center top' + $modaltop,
+		at: 'center top',
+		of: $(document)
+	});
+	
+	$wfmodal.dialog('option', 'position', {
+		my: 'center top' + $modaltop,
 		at: 'center top',
 		of: $(document)
 	});
@@ -766,13 +795,7 @@ var _ioParameters = function() {
 };
 
 
-var _removeBlanks = function(obj) {
-	for (var i = obj.length - 1; i >= 0; i--) {
-		if (!obj[i].name || obj[i].name === '') {
-			obj.splice(i, 1);
-		}
-	}
-};
+
 
 /**
  * initialize the canvas and set up the panzoom
@@ -787,7 +810,7 @@ var _initCanvas = function() {
 		modal: true,
 		draggable: false,
 		position: {
-			my: 'center top+33%',
+			my: 'center top' + $modaltop,
 			at: 'center top',
 			of: $(document)
 		},
@@ -813,14 +836,45 @@ var _initCanvas = function() {
 		]
 	});
 	
+	// create the edit dialog
+	$wfmodal.dialog({
+		autoOpen: false,
+		height: $editheight,
+		width: $editwidth,
+		modal: true,
+		draggable: false,
+		position: {
+			my: 'center top' + $modaltop,
+			at: 'center top',
+			of: $(document)
+		},
+		buttons: [
+		    {
+		    	text: 'OK',
+		    	click: function() {
+					$( this ).dialog( "close" );
+				}
+		    },
+		    {
+		    	text: 'Apply',
+		    	click: function() {
+					$( this ).dialog( "close" );
+				}
+		    },
+		    {
+		    	text: 'Cancel',
+		    	click: function() {
+					$( this ).dialog( "close" );
+				}
+		    },
+		]
+	});
+	
+	
 	// create the tabs
 	$edittabs.tabs({
         activate: function(event, ui) {
-            if (ui.newPanel.attr('id') === 'wf-tab-attributes') {
-            	_removeBlanks($attributes);
-            	$("#wf-attributes-list").jsGrid("render");
-            }
-            else if (ui.newPanel.attr('id') === 'wf-tab-input') {
+        	if (ui.newPanel.attr('id') === 'wf-tab-input') {
             	_removeBlanks($inputs);
             	$("#wf-input-list").jsGrid("render");
             }
@@ -860,7 +914,7 @@ var _initCanvas = function() {
 	
 	$("#wf-attributes-list").jsGrid({
 	    width: "100%",
-	    height: "395px",
+	    height: "250px",
 	    editing: true,
 	    autoload: true,
 	    data: $attributes,
