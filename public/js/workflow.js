@@ -1,7 +1,5 @@
 
 
-
-
 /**
  * variables used through out
  */
@@ -13,12 +11,19 @@ var $elements = [];
 var $menuLoaded, $activities, $workflows, $header, $toolbar, $wf;
 var $panzoom, $workarea, $viewport, $menu, $menutoggle, $iconSize;
 var $droparea, $editmodal, $edittabs, $codemirror, $codefield;
-var $wfmodal;
+var $wfmodal, $vermodal, $errormodal, $confirmmodal, $okmodal;
 
+var $okheight   = 300;
+var $okwidth    = 400;
 var $editheight = 570;
 var $editwidth  = 750;
 var $activetab  = 0;
 var $modaltop   = '+15%';
+var $smmodaltop = '+33%';
+var $wfpath     = '/api/wf';
+
+// get a new instance of jsplumb
+var $diagram = jsPlumb.getInstance();
 
 // define endpoint locations
 var $conn = {
@@ -35,9 +40,20 @@ var getURLParameter = function(name) {
 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(document.location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 };
 
-$.pluck = function(arr, key) { 
+$.pluck = function(arr, key) {
     return $.map(arr, function(e) {
-    	return e[key];
+    	if (Array.isArray(key)) {
+    		var item = {};
+    		for (var i = 0; i < key.length; i++) {
+    			if (e.hasOwnProperty(key[i])) {
+    				item[key[i]] = e[key[i]];
+    			}
+    		}
+    		return item;
+    	}
+    	else {
+        	return e[key];
+    	}
     });
 };
 
@@ -49,13 +65,66 @@ var _removeBlanks = function(obj) {
 	}
 };
 
+
+
+var publish = function(force) {
+
+	var forceQs = (force === true) ? '?force=true' : '';
+	$vermodal.dialog('close');
+	
+    $.ajax({
+        url : $wfpath + '/workflows/' + $wf.id + '/publish' + forceQs,
+        method : 'POST',
+        crossDomain : true,
+        headers : {
+            'Accept' : 'application/json'
+        },
+        dataType: 'json',
+        contentType: 'application/json'
+    })
+    .done(function(data, status, xhr) {
+    	console.log('published',data);
+    })
+    .fail(function(xhr, status, err) {
+    	
+    	if (xhr.responseJSON && xhr.responseJSON.error === 'ER_COULD_NOT_PUBLISH_RELATION') {
+    		$('#wf-confirm-modal-detail').html('<span class="glyphicon glyphicon-question-sign" style="font-size:50px;color:#FDBD02;float:left;margin-left:25px;margin-top:25px;display:inline;width:30px;"></span><div style="float:right;display:inline;width:250px;margin-top:25px;margin-right:25px;">' + xhr.responseJSON.details[0] + '</div>');
+    		$confirmmodal.dialog('option', 'title', '<span class="glyphicon glyphicon-question-sign"></span> Force Publish?');
+    		$confirmmodal.dialog('open');
+    		console.log(xhr.responseJSON.details[0]);
+    	}
+    	else {
+    		console.log(xhr);
+    	}
+    });
+};
+
+
+
+var versionOptions = function() {
+	
+	$('#wf-version-comment').val($wf.change_notes);
+
+	if ($wf.active) {
+		$('#wf-activate-btn').removeClass('btn-success').addClass('btn-default').prop('disabled', true);
+		$('#wf-deactivate-btn').removeClass('btn-default').addClass('btn-danger').prop('disabled', false);
+	}
+	else {
+		$('#wf-activate-btn').removeClass('btn-default').addClass('btn-success').prop('disabled', false);
+		$('#wf-deactivate-btn').removeClass('btn-danger').addClass('btn-default').prop('disabled', true);
+	}
+	
+	$vermodal.dialog('option', 'title', 'Version Options - ' + $wf.name);
+	$vermodal.dialog('open');
+};
+
+
 var editWorkflow = function() {
 	
 	_removeBlanks($attributes);
 	$('#wf-wf-name').val($wf.name);
 	$('#wf-wf-description').val($wf.description);
 	$('#wf-wf-usecurrent').prop('checked', $wf.use_current);
-	
 	$wfmodal.dialog('option', 'title', 'Edit Workflow - ' + $wf.name);
 	$wfmodal.dialog('open');
 	$("#wf-attributes-list").jsGrid("render");
@@ -107,19 +176,23 @@ var _editStep = function(id) {
 var _getObjects = function() {
 	
 	// set the objects
-    $menuLoaded = false;
-    $codefield  = document.getElementById('wf-tab-code');
-    $edittabs   = $('#wf-editTabs');
-    $editmodal	= $('#wf-edit-step');
-    $wfmodal    = $('#wf-edit-workflow');
-    $droparea   = $('#wf-droparea');
-    $toolbar    = $('#wf-toolbar');
-    $header     = $('#wf-header');
-    $menu       = $('#wf-menu');
-    $viewport   = $('#wf-viewport');
-    $workarea   = $('#wf-workarea');
-    $menutoggle = $('#wf-menuToggle');
-    $iconSize   = 'small';
+    $menuLoaded   = false;
+    $codefield    = document.getElementById('wf-tab-code');
+    $confirmmodal = $('#wf-confirm-modal');
+    $okmodal      = $('#wf-ok-modal');
+    $errormodal   = $('#wf-error-modal');
+    $edittabs     = $('#wf-editTabs');
+    $editmodal	  = $('#wf-edit-step');
+    $wfmodal      = $('#wf-edit-workflow');
+    $vermodal     = $('#wf-version-workflow');
+    $droparea     = $('#wf-droparea');
+    $toolbar      = $('#wf-toolbar');
+    $header       = $('#wf-header');
+    $menu         = $('#wf-menu');
+    $viewport     = $('#wf-viewport');
+    $workarea     = $('#wf-workarea');
+    $menutoggle   = $('#wf-menuToggle');
+    $iconSize     = 'small';
 };
 
 
@@ -162,6 +235,27 @@ var _positionElements = function() {
 	
 	$wfmodal.dialog('option', 'position', {
 		my: 'center top' + $modaltop,
+		at: 'center top',
+		of: $(document)
+	});
+	
+	$vermodal.dialog('option', 'position', {
+		my: 'center top' + $modaltop,
+		at: 'center top',
+		of: $(document)
+	});
+	$confirmmodal.dialog('option', 'position', {
+		my: 'center top' + $smmodaltop,
+		at: 'center top',
+		of: $(document)
+	});
+	$errormodal.dialog('option', 'position', {
+		my: 'center top' + $smmodaltop,
+		at: 'center top',
+		of: $(document)
+	});
+	$okmodal.dialog('option', 'position', {
+		my: 'center top' + $smmodaltop,
 		at: 'center top',
 		of: $(document)
 	});
@@ -213,7 +307,7 @@ var _onEvents = function() {
 	});
 	
 	$.contextMenu({
-        selector: '.connectable', 
+        selector: '.connectable',
         callback: function(key, options) {
         	if (key === 'edit') {
         		_editStep(options.$trigger.attr('id'));
@@ -431,28 +525,28 @@ var _addEndpoints = function (toId, e) {
 	
 	if (e.success) {
         var successUUID = toId + e.success;
-        jsPlumb.addEndpoint(toId, _endpointConfig('success'), {
+        $diagram.addEndpoint(toId, _endpointConfig('success'), {
             anchor: e.success,
             uuid: successUUID
         });
 	}
 	if (e.fail) {
         var failUUID = toId + e.fail;
-        jsPlumb.addEndpoint(toId, _endpointConfig('fail'), {
+        $diagram.addEndpoint(toId, _endpointConfig('fail'), {
         	anchor: e.fail,
         	uuid: failUUID
         });
 	}
 	if (e.exception) {
         var exceptUUID = toId + e.exception;
-        jsPlumb.addEndpoint(toId, _endpointConfig('exception'), {
+        $diagram.addEndpoint(toId, _endpointConfig('exception'), {
         	anchor: e.exception,
         	uuid: exceptUUID
         });
 	}
 	if (e.target) {
         var targetUUID = toId + e.target;
-        jsPlumb.addEndpoint(toId, targetEndpoint, {
+        $diagram.addEndpoint(toId, targetEndpoint, {
         	anchor: e.target,
         	uuid: targetUUID
         });
@@ -496,13 +590,13 @@ var _updateMagnets = function(elements, container) {
 	});
 
 	// set the elements to draggable
-	jsPlumb.draggable(elements, {
+	$diagram.draggable(elements, {
 		start : function(p) {
 			_dragElement = p.el.getAttribute("id");
 		},
 		drag : function(p) {
 			magnet.executeAtEvent(p.e);
-			jsPlumb.repaintEverything();
+			$diagram.repaintEverything();
 		},
 		stop : function(p) {
 			_dragElement = null;
@@ -700,7 +794,7 @@ var _connectNodes = function(data) {
 
 		// connect success
 		if (step.success && step.success !== step.id) {
-			jsPlumb.connect({
+			$diagram.connect({
 				uuids:[
 				    step.htmlId + $conn.success,
 				    _findStep(step.success, data) + $conn.target
@@ -710,7 +804,7 @@ var _connectNodes = function(data) {
 		
 		// connect fail
 		if (step.fail && step.fail !== step.id) {
-			jsPlumb.connect({
+			$diagram.connect({
 				uuids:[
 				    step.htmlId + $conn.fail,
 				    _findStep(step.fail, data) + $conn.target
@@ -720,7 +814,7 @@ var _connectNodes = function(data) {
 		
 		// connect left
 		if (step.exception && step.exception !== step.id) {
-			jsPlumb.connect({
+			$diagram.connect({
 				uuids:[
 				    step.htmlId + $conn.exception,
 				    _findStep(step.exception, data) + $conn.target
@@ -786,11 +880,32 @@ var _newItem = function(path, body, step) {
 
 var _ioParameters = function() {
 	return [
-	    { name: 'name', type: 'text' },
-	    { name: 'type', type: 'text' },
-	    { name: 'mapAttribute', type: 'select', items: ['None'].concat($.pluck($attributes, 'name')) },
-	    { name: 'description', type: 'text' },
-	    { type: 'control' }
+	    {
+	    	name: 'name',
+	    	title: 'Name',
+	    	type: 'text'
+	    },
+	    {
+	    	name: 'type',
+	    	title: 'Type',
+	    	type: 'text'
+	    },
+	    {
+	    	name: 'mapAttribute',
+	    	title: 'Bind Attribute',
+	    	type: 'select',
+	    	valueField: 'id',
+	    	textField: 'name',
+	    	items: [{id: '', name: 'None'}].concat($.pluck($attributes, ['id', 'name']))
+	    },
+	    {
+	    	name: 'description',
+	    	title: 'Description',
+	    	type: 'text'
+	    },
+	    {
+	    	type: 'control'
+	    }
     ];
 };
 
@@ -836,6 +951,35 @@ var _initCanvas = function() {
 		]
 	});
 	
+	
+	// create the edit dialog
+	$vermodal.dialog({
+		autoOpen: false,
+		height: $editheight,
+		width: $editwidth,
+		modal: true,
+		draggable: false,
+		position: {
+			my: 'center top' + $modaltop,
+			at: 'center top',
+			of: $(document)
+		},
+		buttons: [
+		    {
+		    	text: 'OK',
+		    	click: function() {
+					$( this ).dialog( "close" );
+				}
+		    },
+		    {
+		    	text: 'Cancel',
+		    	click: function() {
+					$( this ).dialog( "close" );
+				}
+		    },
+		]
+	});
+	
 	// create the edit dialog
 	$wfmodal.dialog({
 		autoOpen: false,
@@ -868,6 +1012,51 @@ var _initCanvas = function() {
 				}
 		    },
 		]
+	});
+	
+	
+	// create the edit dialog
+	$confirmmodal.dialog({
+		autoOpen: false,
+		height: $okheight,
+		width: $okwidth,
+		modal: true,
+		draggable: false,
+		closeText: false,
+		position: {
+			my: 'center top' + $modaltop,
+			at: 'center top',
+			of: $(document)
+		}
+	});
+	
+	
+	// create the edit dialog
+	$okmodal.dialog({
+		autoOpen: false,
+		height: $okheight,
+		width: $okwidth,
+		modal: true,
+		draggable: false,
+		position: {
+			my: 'center top' + $modaltop,
+			at: 'center top',
+			of: $(document)
+		}
+	});
+	
+	// create the edit dialog
+	$errormodal.dialog({
+		autoOpen: false,
+		height: $okheight,
+		width: $okwidth,
+		modal: true,
+		draggable: false,
+		position: {
+			my: 'center top' + $modaltop,
+			at: 'center top',
+			of: $(document)
+		}
 	});
 	
 	
@@ -927,10 +1116,10 @@ var _initCanvas = function() {
 	    	console.log($attributes);
 	    },
 	    fields: [
-	        { name: 'name', type: 'text' },
-	        { name: 'type', type: 'text' },
-	        { name: 'defaultValue', type: 'text' },
-	        { name: 'description', type: 'text' },
+	        { name: 'name', title: 'Name', type: 'text' },
+	        { name: 'type', title: 'Type', type: 'text' },
+	        { name: 'defaultValue', title: 'Default', type: 'text' },
+	        { name: 'description', title: 'Description', type: 'text' },
 	        { type: 'control' }
 	    ]
 	});
@@ -965,12 +1154,12 @@ var _initCanvas = function() {
 	 */
 	
 	// before a new connection is made
-    jsPlumb.bind('beforeDrop', function(info) {
+    $diagram.bind('beforeDrop', function(info) {
         return info.sourceId !== info.targetId;
     });
     
     // when a new connection is made
-    jsPlumb.bind('connection', function(info, event) {
+    $diagram.bind('connection', function(info, event) {
     	
     	// get the connection type
     	var type = info.sourceEndpoint.anchor.type;
@@ -990,7 +1179,7 @@ var _initCanvas = function() {
     });
     
     // when a connection is removed
-    jsPlumb.bind('connectionDetached', function(info, event) {
+    $diagram.bind('connectionDetached', function(info, event) {
     	
     	// get the connection type
     	var type = info.sourceEndpoint.anchor.type;
@@ -1034,7 +1223,7 @@ var _initCanvas = function() {
             var uiStep = _addStep(step, null, ui.offset, $iconSize);
             
             // create the step
-            _newItem('/api/wf/steps', {
+            _newItem($wfpath + '/steps', {
             	activity: ui.draggable.attr('wfActivity'),
             	label: step.label,
             	workflow: $wf.id,
@@ -1117,7 +1306,7 @@ var _loadWorkflow = function(id) {
 	
     // get the workflow
     $.ajax({
-        url : '/api/wf/workflows/' + id,
+        url : $wfpath + '/workflows/' + id,
         method : 'GET',
         crossDomain : true,
         headers : {
@@ -1141,11 +1330,11 @@ var _loadWorkflow = function(id) {
         });
         
         // wait for jsPlumb to be ready
-        jsPlumb.ready(function() {
+        $diagram.ready(function() {
         	$wf = data;
             _addNodes(data, $iconSize);
             _connectNodes(data);
-            _initCanvas(); 
+            _initCanvas();
         });
     })
     .fail(function(xhr, status, err) {
@@ -1202,7 +1391,7 @@ var _loadMenuItems = function() {
 
     // get the activities
     $.ajax({
-        url : '/api/wf/activitys?maxdepth=0',
+        url : $wfpath + '/activitys?maxdepth=0',
         method : 'GET',
         crossDomain : true,
         headers : {
@@ -1225,7 +1414,7 @@ var _loadMenuItems = function() {
         
         // get the workflows
         $.ajax({
-            url : '/api/wf/workflows?maxdepth=0',
+            url : $wfpath + '/workflows?maxdepth=0',
             method : 'GET',
             crossDomain : true,
             headers : {
@@ -1264,6 +1453,13 @@ var _loadMenuItems = function() {
  * call the initialization functions
  */
 $(document).ready(function() {
+
+	// allow html in dialog headers
+	$.widget('ui.dialog', $.extend({}, $.ui.dialog.prototype, {
+	    _title: function(titleBar) {
+	        titleBar.html(this.options.title || '&#160;');
+	    }
+	}));
 	
 	// get the id
 	var id = getURLParameter('id');

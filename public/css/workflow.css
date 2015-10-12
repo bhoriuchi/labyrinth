@@ -185,6 +185,7 @@ div.startItem, div.endItem p {
 	color: #fff;
 	padding: 2px;
 	border: 0px;
+	border-radius: 0px;
 }
 
 .ui-dialog-title {
@@ -212,8 +213,13 @@ div.startItem, div.endItem p {
 	overflow-x: hidden;
 }
 
+.publish-button {
+	width: 150px;
+	text-align: left;
+}
 
 .new-param {
+	float: right;
 	margin-bottom: 8px;
 }
 

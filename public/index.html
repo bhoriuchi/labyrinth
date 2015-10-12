@@ -12,28 +12,19 @@
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="stylesheet" href="css/bootstrap.min.css">
-<style>
-body {
-	padding-top: 50px;
-	padding-bottom: 20px;
-}
-
-.ui-widget * {
-	outline: none;
-}
-​
-</style>
-<link rel="stylesheet" type="text/css" href="./css/bootstrap-theme.min.css">
-<link rel="stylesheet" type="text/css" href="./css/jquery-ui-custom/jquery-ui.min.css">
-<link rel="stylesheet" type="text/css" href="./css/codemirror.css">
-<link rel="stylesheet" type="text/css" href="./css/jquery.contextMenu.css">
-<link rel="stylesheet" type="text/css" href="./css/jsgrid.min.css">
-<link rel="stylesheet" type="text/css" href="./css/jsgrid-theme.min.css">
-<link rel="stylesheet" type="text/css" href="./css/main.css">
-<link rel="stylesheet" type="text/css" href="./css/workflow.css">
-
-<script src="./js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<style>
+		body {
+			padding-top: 50px;
+			padding-bottom: 20px;
+		}
+		
+		.ui-widget * {
+			outline: none;
+		}
+	</style>
+	<link rel="stylesheet" type="text/css" href="./css/main.css">
+	<script src="./js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
 </head>
 <body>
 	<!--[if lt IE 8]>
@@ -110,9 +101,66 @@ body {
             <div id="wf-toolbar">
             	<span class="btn btn-default glyphicon glyphicon-pencil gi-md" onClick="editWorkflow()" data-toggle="tooltip" title="Edit workflow properties"></span>
                 <span class="btn btn-default glyphicon glyphicon-floppy-save gi-md" data-toggle="tooltip" title="Save workflow changes"></span>
+                <span class="btn btn-default glyphicon glyphicon-time gi-md" onClick="versionOptions()" data-toggle="tooltip" title="Version options"></span>
                 <span class="btn btn-default glyphicon glyphicon-refresh gi-md" onClick="resetPanzoom()" data-toggle="tooltip" title="Reset pan and zoom"></span>
+                <span class="btn btn-default glyphicon glyphicon-info-sign gi-md" data-toggle="tooltip" title="Workflow Run Information"></span>
             </div>
-            <img src="./img/chevrons.svg" class="rotate0" id="wf-menuToggle" onClick="toggleMenu()" data-toggle="tooltip" title="Workflow menu">
+            <img src="./img/chevrons.svg" class="rotate0" id="wf-menuToggle" onClick="toggleMenu()" data-toggle="tooltip" title="Workflow items">
+            
+            
+            <div id="wf-version-workflow" title="Workflow Version Options" style="display: none;">
+                <br><br>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="wf-version-comment" data-toggle="tooltip" title="Comment for this workflow version" class="control-label col-xs-2">Comment:</label>
+                        <div class="col-xs-8">
+                            <input id="wf-version-comment" type="text" name="wf-version-comment" value="" class="form-control">
+                        </div>
+                        <button type="button" class="btn btn-primary btn-lg">
+                            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Save
+                        </button>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="form-group">
+                        <label data-toggle="tooltip" title="Publish options" class="control-label col-xs-2">Publish:</label>
+	                    <div class="btn-group col-xs-8" data-toggle="buttons">
+                            <button id="wf-publish-btn" name="wf-publish-btn" onClick="publish()" class="btn btn-primary btn-lg publish-button">
+                                <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> Publish
+                            </button>
+	                    </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-2"></label>
+                        <div class="btn-group col-xs-8" data-toggle="buttons">
+                            <button id="wf-unpublish-btn" name="wf-unpublish-btn" class="btn btn-info btn-lg publish-button">
+                                <span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Unpublish
+                            </button>
+                        </div>
+                    </div>                   
+                    
+                    <hr>
+                                                
+                    
+                    <div class="form-group">
+                        <label data-toggle="tooltip" title="Activation options" class="control-label col-xs-2">Activation:</label>
+                        <div class="btn-group col-xs-8" data-toggle="buttons">
+                            <button id="wf-activate-btn" name="wf-activate-btn" onClick="javascript:console.log('clicked a disabled');" class="btn btn-default btn-lg publish-button">
+                                <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span> Activate
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-2"></label>
+                        <div class="btn-group col-xs-8" data-toggle="buttons">
+                            <button id="wf-deactivate-btn" name="wf-deactivate-btn" class="btn btn-default btn-lg publish-button">
+                                <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Deactivate
+                            </button>
+                        </div>
+                    </div>            
+                </form>
+            </div>        
             
             <div id="wf-edit-workflow" title="Edit Workflow" style="display: none;">
             	<br><br>
@@ -138,9 +186,9 @@ body {
 					</div>
 				</form>
 				<label for="wf-attributes-list">Attributes:</label>
-				<a href="#" wfParamType="attribute" class="btn btn-default btn-xs new-param" style="float:right;">
+				<button type="button" wfParamType="attribute" class="btn btn-primary btn-xs new-param">
 					<span class="glyphicon glyphicon-plus"></span> New Attribute
-				</a>
+				</button>
 				<div id="wf-attributes-list"></div>
             </div>
             
@@ -151,7 +199,7 @@ body {
 						<li><a href="#wf-tab-general">General</a></li>
 						<li><a href="#wf-tab-input">Input</a></li>
 						<li><a href="#wf-tab-output">Output</a></li>
-						<li><a href="#wf-tab-source">Source</a></li>
+						<li><a href="#wf-tab-source">Scripting</a></li>
 					</ul>
 					<div id="wf-tab-general">
 						<form class="form-horizontal">
@@ -198,15 +246,15 @@ body {
 						</form>
 					</div>
 					<div id="wf-tab-input">
-						<a href="#" wfParamType="input" class="btn btn-default btn-xs new-param" style="float:right;">
+						<button type="button" wfParamType="input" class="btn btn-primary btn-xs new-param">
 							<span class="glyphicon glyphicon-plus"></span> New Input
-						</a>
+						</button>
 						<div id="wf-input-list"></div>
 					</div>
 					<div id="wf-tab-output">
-						<a href="#" wfParamType="output" class="btn btn-default btn-xs new-param" style="float:right;">
+						<button type="button" wfParamType="output" class="btn btn-primary btn-xs new-param">
 							<span class="glyphicon glyphicon-plus"></span> New Output
-						</a>
+						</button>
 						<div id="wf-output-list"></div>
 					</div>
 					<div id="wf-tab-source">
@@ -214,6 +262,13 @@ body {
 					</div>
 				</div>
 			</div>
+			
+            <div id="wf-confirm-modal" title="Confirm" style="display:none;">
+			    <div id="wf-confirm-modal-detail"></div>
+			
+			</div>
+			<div id="wf-ok-modal" title="OK" style="display:none;"></div>
+			<div id="wf-error-modal" title="Error" style="display:none;"></div>
             
             <!--
 			<p style="display:none;">
