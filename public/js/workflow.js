@@ -83,18 +83,29 @@ var publish = function(force) {
         contentType: 'application/json'
     })
     .done(function(data, status, xhr) {
+    	$confirmmodal.dialog('close');
     	console.log('published',data);
     })
     .fail(function(xhr, status, err) {
     	
     	if (xhr.responseJSON && xhr.responseJSON.error === 'ER_COULD_NOT_PUBLISH_RELATION') {
-    		$('#wf-confirm-modal-detail').html('<span class="glyphicon glyphicon-question-sign" style="font-size:50px;color:#FDBD02;float:left;margin-left:25px;margin-top:25px;display:inline;width:30px;"></span><div style="float:right;display:inline;width:250px;margin-top:25px;margin-right:25px;">' + xhr.responseJSON.details[0] + '</div>');
+
+    		$('#wf-confirm-modal-detail').html('One or more dependents require publishing in order to publish this workflow. Select OK to force dependent publishing or Cancel to quit');
+    		$('#wf-confirm-button').off();
+    		$('#wf-confirm-button').on('click', function() {
+    			publish(true);
+    		});
+    		$confirmmodal.parent().find('.ui-dialog-titlebar').addClass('dialog-confirm');
     		$confirmmodal.dialog('option', 'title', '<span class="glyphicon glyphicon-question-sign"></span> Force Publish?');
     		$confirmmodal.dialog('open');
     		console.log(xhr.responseJSON.details[0]);
     	}
     	else {
     		console.log(xhr);
+    		$('#wf-error-modal-detail').html(xhr.responseJSON.message);
+    		$errormodal.parent().find('.ui-dialog-titlebar').addClass('dialog-error');
+    		$errormodal.dialog('option', 'title', '<span class="glyphicon glyphicon-exclamation-sign"></span> Error');
+    		$errormodal.dialog('open');
     	}
     });
 };
@@ -290,6 +301,10 @@ var _onEvents = function() {
 			});
 			
 		}
+	});
+	
+	$('.dialog-btn-cancel').on('click', function() {
+		$('#' + $(this).attr('wfDialog')).dialog('close');
 	});
 	
 	

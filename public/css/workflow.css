@@ -180,13 +180,49 @@ div.startItem, div.endItem p {
 .ui-widget-overlay{
 	z-index:1010;
 }
+
 .ui-dialog-titlebar {
-	background: #666666;
-	color: #fff;
 	padding: 2px;
 	border: 0px;
 	border-radius: 0px;
 }
+
+.dialog-message {
+	float:right;
+	display:inline;
+	width:290px;
+	height: 180px;
+	margin-top:25px;
+	margin-right:25px;
+}
+.dialog-icon {
+	font-size:50px;
+	float:left;
+	margin-left:25px;
+	margin-top:25px;
+	display:inline;
+	width:30px;
+}
+.dialog-confirm {
+	background: #FDBD02;
+}
+.dialog-error {
+	background: #d9534f;
+}
+.dialog-confirm-icon {
+	color:#FDBD02;
+}
+.dialog-error-icon {
+	color:#d9534f;
+}
+.dialog-btn {
+	width: 100px;
+}
+.dialog-btn-cancel {
+	
+}
+
+
 
 .ui-dialog-title {
 	font-family:Verdana;
