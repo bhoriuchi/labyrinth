@@ -1,4 +1,13 @@
 
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+        
+.ui-widget * {
+    outline: none;
+}
+
 div.item-sm {
 	width: 35px;
 	height: 35px;
@@ -477,3 +486,4 @@ div.startItem, div.endItem p {
 #itemSelect .ui-accordion-header:last-of-type {
 	background: #E2A247;
 }
+
