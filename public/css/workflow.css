@@ -212,26 +212,36 @@ div.startItem, div.endItem p {
 	display:inline;
 	width:30px;
 }
-.dialog-confirm {
-	background: #FDBD02;
-}
-.dialog-error {
-	background: #d9534f;
-}
-.dialog-confirm-icon {
-	color:#FDBD02;
-}
-.dialog-error-icon {
-	color:#d9534f;
-}
+
 .dialog-btn {
 	width: 100px;
 }
-.dialog-btn-cancel {
-	
+
+.dialog-ok {
+	background: #258fcd;
+}
+.dialog-ok-icon {
+	color: #258fcd;
+}
+
+.dialog-confirm {
+	background: #FDBD02;
+}
+.dialog-confirm-icon {
+	color: #FDBD02;
+}
+
+.dialog-error {
+	background: #d9534f;
+}
+.dialog-error-icon {
+	color: #d9534f;
 }
 
 
+.dialog-btn-cancel {
+	
+}
 
 .ui-dialog-title {
 	font-family:Verdana;
@@ -387,6 +397,20 @@ div.startItem, div.endItem p {
 	overflow: hidden;
 }
 
+#wf-loading-modal {
+	position: relative;
+	width: 200px;
+	height: 90px;
+	z-index: 65000;
+}
+
+#wf-loading-modal > div {
+	width: 90px;
+	height: auto;
+	top: 25%;
+	margin: 0 auto;
+	position: relative;	
+}
 
 #wf-toolbar {
 	top: 0;

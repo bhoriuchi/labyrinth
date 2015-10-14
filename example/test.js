@@ -25,24 +25,36 @@ var config = {
 };
 
 
-var dream     = require('dreamcatcher')(config);
-var labyrinth = dream.register.plugin('labyrinth', require('../lib/labyrinth'));
-var _         = dream.mods.lodash;
+// main module setup
+var dream      = require('dreamcatcher')(config);
+var labyrinth  = dream.register.plugin('labyrinth', require('../lib/labyrinth'));
 
+
+// allow modules
 labyrinth.modules.set(['console', 'lodash']);
 
-
 labyrinth.setup.install().then(function() {
-	//console.log('Created routes', _.uniq(_.pluck(labyrinth.routes, 'route.path')));
+
+	// get the routes
 	var routes = dream.getRoutes();
+
+	// push a handlebars route for the main ui
+	routes.push(dream.hbsRoute({
+		path: '/public',
+		template: '../public/templates/index.hbs',
+		context: {
+			'public': '/public'
+		},
+		live: true
+	}));
 	
-	// push a route to the basic UI
+	// push a route for content
 	routes.push(dream.staticRoute({
 		path: /\/public\/?.*/,
 		directory: __dirname.replace('/example', ''),
 		'default': 'index.html'
 	}));
 	
+	// run the server
 	dream.run(routes);
-	
 });

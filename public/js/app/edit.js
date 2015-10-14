@@ -10,6 +10,7 @@ define(['jquery', 'wf-global', 'wf-util'], function($, $g, $util) {
 
 		var forceQs = (force === true) ? '?force=true' : '';
 		$g.verModal.dialog('close');
+		$g.loadingModal.dialog('open');
 		
 	    $.ajax({
 	        url : $g.wfpath + '/workflows/' + $g.wf.id + '/publish' + forceQs,
@@ -23,6 +24,9 @@ define(['jquery', 'wf-global', 'wf-util'], function($, $g, $util) {
 	    })
 	    .done(function(data, status, xhr) {
 	    	$g.confirmModal.dialog('close');
+	    	$('#wf-ok-modal-detail').html('Successfully published version ' + data[0].current_version);
+    		$g.okModal.dialog('option', 'title', ' Successfully Published!');
+    		$g.okModal.dialog('open');
 	    	console.log('published',data);
 	    })
 	    .fail(function(xhr, status, err) {
@@ -36,14 +40,15 @@ define(['jquery', 'wf-global', 'wf-util'], function($, $g, $util) {
 	    		});
 	    		$g.confirmModal.dialog('option', 'title', ' Force Publish?');
 	    		$g.confirmModal.dialog('open');
-	    		console.log(xhr.responseJSON.details[0]);
 	    	}
 	    	else {
-	    		console.log(xhr);
 	    		$('#wf-error-modal-detail').html(xhr.responseJSON.message);
 	    		$g.errorModal.dialog('option', 'title', 'Error');
 	    		$g.errorModal.dialog('open');
 	    	}
+	    })
+	    .always(function() {
+	    	$g.loadingModal.dialog('close');
 	    });
 	};
 
@@ -60,14 +65,15 @@ define(['jquery', 'wf-global', 'wf-util'], function($, $g, $util) {
 
 
 	var editStep = function(id) {
-		
 		// get the step
 		var step = $g.steps[id];
+		
+		var activity = step.activity ? step.activity : step;
 
 		// open the dialog
-		if (!step.activity.readonly) {
-			if (step.activity && step.activity.source) {
-				$g.codemirror.setValue(step.activity.source);
+		if (!activity.readonly) {
+			if (activity && activity.source) {
+				$g.codemirror.setValue(activity.source);
 			}
 			else {
 				$g.codemirror.setValue('');
@@ -94,6 +100,7 @@ define(['jquery', 'wf-global', 'wf-util'], function($, $g, $util) {
 			
 			$g.editModal.dialog('option', 'title', 'Edit Step - ' + step.label);
 			$g.editModal.dialog('open');
+			$g.codemirror.refresh();
 		}
 	};
 	

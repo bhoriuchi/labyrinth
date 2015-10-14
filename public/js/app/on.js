@@ -14,10 +14,8 @@ define(
 	    'jquery-panzoom'
 	],
 	function($, $g, $ui, $edit, $item) {
-	
 	// when a node is double clicked
 	$(document).on('dblclick', '.connectable', function() {
-		
 		// get the id
 		var id   = $(this)[0].id;
 		$edit.editStep(id);
@@ -36,19 +34,20 @@ define(
 		}
 	});
 	
-	
 	$g.toolbarEdit.on('click', function() {
 		$edit.editWorkflow();
+	});
+	
+	$g.toolbarSave.on('click', function() {
+		$ui.updateUiPositions();
 	});
 	
 	$g.toolbarReset.on('click', function() {
 		$g.workarea.panzoom('reset');
 	});
-	
 	$g.toolbarVersion.on('click', function() {
 		$edit.versionOptions();
 	});
-	
 	
 	$('#wf-publish-btn').on('click', function() {
 		$edit.publish();
@@ -60,8 +59,8 @@ define(
 		$ui.toggleMenu();
 	});
 	
-	
     $g.droparea.droppable({
+    	accept: '.menuObject',
         drop: function(e, ui) {
         	
         	// remove the helper
@@ -88,7 +87,7 @@ define(
             }, uiStep);
         }
     });
-	
+    
 	$('#wf-step-wait').on('change', function() {
 		if ($(this).prop('checked')) {
 			$('#wf-step-requirekey-form').fadeIn();

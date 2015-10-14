@@ -74,35 +74,42 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 		});
 		
 		$g.editModal.dialog('option', 'position', {
-			my: 'center top' + $g.modaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.modaltop,
 			of: $(document)
 		});
 		
 		$g.wfModal.dialog('option', 'position', {
-			my: 'center top' + $g.modaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.modaltop,
 			of: $(document)
 		});
 		
 		$g.verModal.dialog('option', 'position', {
-			my: 'center top' + $g.modaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.modaltop,
 			of: $(document)
 		});
 		$g.confirmModal.dialog('option', 'position', {
-			my: 'center top' + $g.smmodaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.smmodaltop,
 			of: $(document)
 		});
 		$g.errorModal.dialog('option', 'position', {
-			my: 'center top' + $g.smmodaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.smmodaltop,
 			of: $(document)
 		});
 		$g.okModal.dialog('option', 'position', {
-			my: 'center top' + $g.smmodaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.smmodaltop,
+			of: $(document)
+		});
+		
+		
+		$g.loadingModal.dialog('option', 'position', {
+			my: 'center top',
+			at: 'center top' + $g.loadtop,
 			of: $(document)
 		});
 	};
@@ -122,14 +129,21 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 	/**
 	 * position the workarea
 	 */
-	var positionWorkarea = function() {
-
+	var positionWorkarea = function(position) {
 		
 		// reposition the work area
 		$g.workarea.position({
 			using: function(pos, fb) {
-				$(this).css('top', -(fb.element.height / 2 ));
-				$(this).css('left', -(fb.element.width / 2 ));
+				
+				if (position) {
+					$(this).css('top', position.top);
+					$(this).css('left', position.left);
+				}
+				else {
+					$(this).css('top', -(fb.element.height / 2 ));
+					$(this).css('left', -(fb.element.width / 2 ));					
+				}
+
 			},
 			of : $g.viewport
 		});
@@ -142,12 +156,39 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 		});
 	};
 	
+	/**
+	 * update ui positions
+	 */
+	var updateUiPositions = function() {
+		
+		// get the workarea dimensions
+		var left = $g.workarea.width() / 2;
+		var top  = $g.workarea.height() / 2;
+
+		// set the workarea position
+		$g.wf.ui = $g.workarea.position();
+		
+		// get each connectable and set their offset
+		$('.connectable').each(function() {
+			var jqo  = $(this);
+			var oset = jqo.offset();
+			$g.steps[jqo.attr('id')].ui = {
+				left: left + oset.left,
+				top: top + oset.top
+			};
+		});
+		
+		console.log($g.steps);
+		
+	};
+	
 	
 	// return the functions
 	return {
 		toggleMenu: toggleMenu,
 		positionElements: positionElements,
 		makeMenuDraggable: makeMenuDraggable,
-		positionWorkarea: positionWorkarea
+		positionWorkarea: positionWorkarea,
+		updateUiPositions: updateUiPositions
 	};
 });

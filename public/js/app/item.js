@@ -109,7 +109,10 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	var addItem = function(step, prev, position, size) {
 		
 		// set up new variables
-		var itemClass, endpoint, posObj, posLbl, end, $newObj;
+		var itemClass, endpoint, posObj, posLbl, end, $newObj, activity;
+		
+		// check for activity defined at the step level
+		activity = step.activity ? step.activity : step;
 		
 		// initialize a new id and size
 		var newId      = 'item_' + (new Date()).getTime();
@@ -168,12 +171,12 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		
 		// look at the activity type and add the appropriate endpoints
 		// an styles
-		if (step.activity.type === 'start') {
+		if (activity.type === 'start') {
 			endpoint = {
 				success: $g.conn.success
 					};
 		}
-		else if (step.activity.type === 'end') {
+		else if (activity.type === 'end') {
 			endpoint = {
 				target: $g.conn.target
 			};
@@ -188,15 +191,15 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		}
 		
 		// create an item class
-		itemClass = sizeClass + ' item ' + step.activity.type + 'Item';
+		itemClass = sizeClass + ' item ' + activity.type + 'Item';
 
 		
 		// create the html for the step
 		var stepHTML = 	'<div id="' + newId +
 						'" wfItemLabel="' + step.label +
-						'" wfItemType="' + step.activity.type +
+						'" wfItemType="' + activity.type +
 						'" wfItemId="' + step.id +
-						'" wfActivity="' + step.activity.id +
+						'" wfActivity="' + activity.id +
 						'" class="' + sizeClass + ' connectable magnetized">' +
 						'    <div class="' + itemClass + '"></div>' +
 						'    <div id="itemlabel-' + newId + '" class="itemLabel">' +
@@ -244,7 +247,20 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		
 		// create the step divs and get the start/end ids
 		$.each(data.steps, function(index, step) {
-			prevElement = addItem(step, prevElement, null, size);
+			var pos;
+			try {
+				pos = JSON.parse(step.ui);
+				
+				pos = {
+					top: pos.top - ($g.workarea.height() / 2),
+					left: pos.left - ($g.workarea.width() / 2)
+				};
+			}
+			catch (err) {
+				pos = null;
+			}
+			//pos = null;
+			prevElement = addItem(step, prevElement, pos, size);
 			data.steps[index].htmlId = prevElement.attr('id');
 		});
 	};

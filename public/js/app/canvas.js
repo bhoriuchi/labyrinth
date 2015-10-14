@@ -299,7 +299,6 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 		/**
 		 * bind the jsPlumb events
 		 */
-		
 		// before a new connection is made
 	    $g.diagram.bind('beforeDrop', function(info) {
 	        return info.sourceId !== info.targetId;

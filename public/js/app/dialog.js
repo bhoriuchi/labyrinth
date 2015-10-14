@@ -5,40 +5,57 @@
  */
 define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 	
+	$g.loadingModal.css('position', 'relative').dialog({
+		autoOpen: false,
+		height: 110,
+		width: 200,
+		modal: true,
+		draggable: false,
+		resizable: false,
+		position: {
+			my: 'center top',
+			at: 'center top' + $g.loadtop,
+			of: $(document)
+		}
+	})
+	.parent()
+	.find('.ui-dialog-titlebar')
+	.css('display', 'none');
+	
+	
 	// create the edit dialog
 	$g.editModal.dialog({
 		autoOpen: false,
 		height: $g.editheight,
 		width: $g.editwidth,
 		modal: true,
-		draggable: false,
+		draggable: true,
 		position: {
-			my: 'center top' + $g.modaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.modaltop,
 			of: $(document)
 		},
 		buttons: [
 		    {
 		    	text: 'OK',
 		    	click: function() {
-					$( this ).dialog( "close" );
+		    		$g.editModal.dialog( "close" );
 				}
 		    },
 		    {
 		    	text: 'Apply',
 		    	click: function() {
-					$( this ).dialog( "close" );
+		    		$g.editModal.dialog( "close" );
 				}
 		    },
 		    {
 		    	text: 'Cancel',
 		    	click: function() {
-					$( this ).dialog( "close" );
+		    		$g.editModal.dialog( "close" );
 				}
 		    },
 		]
 	});
-	
 	
 	// create the edit dialog
 	$g.verModal.dialog({
@@ -46,10 +63,10 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 		height: $g.editheight,
 		width: $g.editwidth,
 		modal: true,
-		draggable: false,
+		draggable: true,
 		position: {
-			my: 'center top' + $g.modaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.modaltop,
 			of: $(document)
 		},
 		buttons: [
@@ -74,10 +91,10 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 		height: $g.editheight,
 		width: $g.editwidth,
 		modal: true,
-		draggable: false,
+		draggable: true,
 		position: {
-			my: 'center top' + $g.modaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.modaltop,
 			of: $(document)
 		},
 		buttons: [
@@ -109,15 +126,14 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 		height: $g.okheight,
 		width: $g.okwidth,
 		modal: true,
-		draggable: false,
+		draggable: true,
 		closeText: false,
 		position: {
-			my: 'center top' + $g.modaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.smmodaltop,
 			of: $(document)
 		}
-	});
-	$g.confirmModal
+	})
 	.parent()
 	.find('.ui-dialog-titlebar')
 	.prepend('<span class="glyphicon glyphicon-question-sign pull-left"></span>')
@@ -130,13 +146,17 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 		height: $g.okheight,
 		width: $g.okwidth,
 		modal: true,
-		draggable: false,
+		draggable: true,
 		position: {
-			my: 'center top' + $g.modaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.smmodaltop,
 			of: $(document)
 		}
-	});
+	})
+	.parent()
+	.find('.ui-dialog-titlebar')
+	.prepend('<span class="glyphicon glyphicon-ok-sign pull-left"></span>')
+	.addClass('dialog-ok');
 	
 	// create the edit dialog
 	$g.errorModal.dialog({
@@ -144,16 +164,15 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 		height: $g.okheight,
 		width: $g.okwidth,
 		modal: true,
-		draggable: false,
+		draggable: true,
 		position: {
-			my: 'center top' + $g.modaltop,
-			at: 'center top',
+			my: 'center top',
+			at: 'center top' + $g.smmodaltop,
 			of: $(document)
 		}
-	});
-	$g.errorModal
+	})
 	.parent()
 	.find('.ui-dialog-titlebar')
-	.prepend('<span class="glyphicon glyphicon-exclamation-sign"></span>')
+	.prepend('<span class="glyphicon glyphicon-exclamation-sign pull-left"></span>')
 	.addClass('dialog-error');
 });

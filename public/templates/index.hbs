@@ -1,0 +1,299 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="">
+<!--<![endif]-->
+<head>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>LABYRINTH Workflow</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{public}}/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="{{public}}/css/main.css">
+        <script src="{{public}}/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed"
+                        data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                        aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span> <span
+                        class="icon-bar"></span> <span class="icon-bar"></span> <span
+                        class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#"> <img src="{{public}}/img/labyrinth.svg"
+                        style="width: 20px; height: 20px; float: left;">
+                    <span style="float: right;">&nbsp;&nbsp;LABYRINTH</span>
+                    </a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                </div>
+                <!--/.navbar-collapse -->
+            </div>
+        </nav>
+        <!-- Main jumbotron for a primary marketing message or call to action -->
+        <div id="wf-jumbotron" class="jumbotron">
+            <div class="container">
+                <!-- Workflow Menu -->
+                <div id="wf-menu">
+                    <div id="itemSelect" style="height: 600px">
+                        <h3>General</h3>
+                        <div>
+                            <div>
+                                <input type="text" id="generalFilter">&nbsp;&nbsp;<span class="glyphicon glyphicon-search"></span>
+                                <br><br>
+                                <ul class="itemList" id="generalObjects"></ul>
+                            </div>
+                        </div>
+                        <h3>Tasks</h3>
+                        <div>
+                            <div>
+                                <input type="text" id="taskFilter">&nbsp;&nbsp;<span class="glyphicon glyphicon-search"></span>
+                                <div id="taskObjects"></div>
+                            </div>
+                        </div>
+                        <h3>Workflows</h3>
+                        <div>
+                            <div>
+                                <input type="text" id="workflowFilter">&nbsp;&nbsp;<span class="glyphicon glyphicon-search"></span>
+                                <div id="workflowObjects"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h3 id="wf-header"></h3>
+                <div id="wf-viewport">
+                    <div id="wf-workarea"></div>
+                </div>
+                <div id="wf-droparea"></div>
+                <div id="wf-toolbar">
+                    <span class="btn btn-default glyphicon glyphicon-pencil gi-md" id="wf-toolbar-edit" data-toggle="tooltip" title="Edit workflow properties"></span>
+                    <span class="btn btn-default glyphicon glyphicon-floppy-save gi-md" id="wf-toolbar-save" data-toggle="tooltip" title="Save workflow changes"></span>
+                    <span class="btn btn-default glyphicon glyphicon-time gi-md" id="wf-toolbar-version" data-toggle="tooltip" title="Version options"></span>
+                    <span class="btn btn-default glyphicon glyphicon-refresh gi-md" id="wf-toolbar-reset" data-toggle="tooltip" title="Reset pan and zoom"></span>
+                    <span class="btn btn-default glyphicon glyphicon-info-sign gi-md" data-toggle="tooltip" title="Workflow Run Information"></span>
+                </div>
+                <img src="{{public}}/img/chevrons.svg" class="rotate0" id="wf-menuToggle" data-toggle="tooltip" title="Workflow items">
+                <div id="wf-version-workflow" title="Workflow Version Options" style="display: none;">
+                    <br><br>
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="wf-version-comment" data-toggle="tooltip" title="Comment for this workflow version" class="control-label col-xs-2">Comment:</label>
+                            <div class="col-xs-8">
+                                <input id="wf-version-comment" type="text" name="wf-version-comment" value="" class="form-control">
+                            </div>
+                            <button type="button" class="btn btn-primary btn-lg">
+                            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Save
+                            </button>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <label data-toggle="tooltip" title="Publish options" class="control-label col-xs-2">Publish:</label>
+                            <div class="btn-group col-xs-8" data-toggle="buttons">
+                                <button id="wf-publish-btn" name="wf-publish-btn" class="btn btn-primary btn-lg publish-button">
+                                <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span> Publish
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-xs-2"></label>
+                            <div class="btn-group col-xs-8" data-toggle="buttons">
+                                <button id="wf-unpublish-btn" name="wf-unpublish-btn" class="btn btn-info btn-lg publish-button">
+                                <span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Unpublish
+                                </button>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <label data-toggle="tooltip" title="Activation options" class="control-label col-xs-2">Activation:</label>
+                            <div class="btn-group col-xs-8" data-toggle="buttons">
+                                <button id="wf-activate-btn" name="wf-activate-btn" onClick="javascript:console.log('clicked a disabled');" class="btn btn-default btn-lg publish-button">
+                                <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span> Activate
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-xs-2"></label>
+                            <div class="btn-group col-xs-8" data-toggle="buttons">
+                                <button id="wf-deactivate-btn" name="wf-deactivate-btn" class="btn btn-default btn-lg publish-button">
+                                <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Deactivate
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div id="wf-edit-workflow" title="Edit Workflow" style="display: none;">
+                    <br><br>
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="wf-wf-name" data-toggle="tooltip" title="The name of the workflow" class="control-label col-xs-2">Name:</label>
+                            <div class="col-xs-10">
+                                <input id="wf-wf-name" type="text" name="wf-wf-name" value="" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="wf-wf-description" data-toggle="tooltip" title="Optional workflow description" class="control-label col-xs-2">Description:</label>
+                            <div class="col-xs-10">
+                                <input id="wf-wf-description" type="text" name="wf-wf-description" value="" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-offset-2 col-xs-10">
+                                <div class="checkbox">
+                                    <label data-toggle="tooltip" title="Always use the current version"><input id="wf-wf-usecurrent" type="checkbox" value="">Use Current</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <label for="wf-attributes-list">Attributes:</label>
+                    <button type="button" wfParamType="attribute" class="btn btn-primary btn-xs new-param">
+                    <span class="glyphicon glyphicon-plus"></span> New Attribute
+                    </button>
+                    <div id="wf-attributes-list"></div>
+                </div>
+                <div id="wf-edit-step" title="Edit Step" style="display:none;">
+                    <div id="wf-editTabs">
+                        <ul>
+                            <li><a href="#wf-tab-general">General</a></li>
+                            <li><a href="#wf-tab-input">Input</a></li>
+                            <li><a href="#wf-tab-output">Output</a></li>
+                            <li><a href="#wf-tab-source">Scripting</a></li>
+                        </ul>
+                        <div id="wf-tab-general">
+                            <form class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="wf-step-name" data-toggle="tooltip" title="The name of the step" class="control-label col-xs-2">Name:</label>
+                                    <div class="col-xs-10">
+                                        <input id="wf-step-name" type="text" name="wf-step-name" value="" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="wf-step-timeout" data-toggle="tooltip" title="Maximum runtime of task in milliseconds; 0 for no timeout" class="control-label col-xs-2">Timeout (ms):</label>
+                                    <div class="col-xs-10">
+                                        <input id="wf-step-timeout" type="text" name="wf-step-timeout" value="" class="form-control shortTextField">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-xs-offset-2 col-xs-10">
+                                        <div class="checkbox">
+                                            <label data-toggle="tooltip" title="Always use the current version"><input id="wf-step-usecurrent" type="checkbox" value="">Use Current</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-xs-offset-2 col-xs-10">
+                                        <div class="checkbox">
+                                            <label data-toggle="tooltip" title="Fail the entire workflow if this step fails"><input id="wf-step-failworkflow" type="checkbox" value="">Fail Workflow</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-xs-offset-2 col-xs-10">
+                                        <div class="checkbox">
+                                            <label data-toggle="tooltip" title="Do not proceed to the next step on completion"><input id="wf-step-wait" type="checkbox" value="">Wait On Success</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" id="wf-step-requirekey-form">
+                                    <div class="col-xs-offset-2 col-xs-10">
+                                        <div class="checkbox">
+                                            <label data-toggle="tooltip" title="Require a run key to move to the next step"><input id="wf-step-requirekey" type="checkbox" value="">Require Key</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div id="wf-tab-input">
+                            <button type="button" wfParamType="input" class="btn btn-primary btn-xs new-param">
+                            <span class="glyphicon glyphicon-plus"></span> New Input
+                            </button>
+                            <div id="wf-input-list"></div>
+                        </div>
+                        <div id="wf-tab-output">
+                            <button type="button" wfParamType="output" class="btn btn-primary btn-xs new-param">
+                            <span class="glyphicon glyphicon-plus"></span> New Output
+                            </button>
+                            <div id="wf-output-list"></div>
+                        </div>
+                        <div id="wf-tab-source">
+                            <textarea id="wf-tab-code"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div id="wf-confirm-modal" title="Confirm" class="container" style="display:none;">
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <span class="glyphicon glyphicon-question-sign dialog-icon dialog-confirm-icon"></span>
+                        </div>
+                        <div id="wf-confirm-modal-detail" class="dialog-message col-xs-10"></div>
+                    </div>
+                    <div class="row">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-3">
+                                    <button type="button" id="wf-confirm-button" class="btn btn-default btn-lg dialog-btn">OK</button>
+                                </div>
+                                <div class="col-xs-3">
+                                    <button type="button" wfDialog="wf-confirm-modal" class="btn btn-default btn-lg dialog-btn dialog-btn-cancel">Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="wf-ok-modal" title="OK" class="container" style="display:none;">
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <span class="glyphicon glyphicon-ok-sign dialog-icon dialog-ok-icon"></span>
+                        </div>
+                        <div id="wf-ok-modal-detail" class="dialog-message col-xs-10"></div>
+                    </div>
+                    <div class="row">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-xs-7"></div>
+                                <div class="col-xs-3">
+                                    <button type="button" wfDialog="wf-ok-modal" class="btn btn-default btn-lg dialog-btn dialog-btn-cancel">OK</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="wf-error-modal" title="Error" class="container" style="display:none;">
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <span class="glyphicon glyphicon-exclamation-sign dialog-icon dialog-error-icon"></span>
+                        </div>
+                        <div id="wf-error-modal-detail" class="dialog-message col-xs-10"></div>
+                    </div>
+                    <div class="row">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-xs-7"></div>
+                                <div class="col-xs-3">
+                                    <button type="button" wfDialog="wf-error-modal" class="btn btn-default btn-lg dialog-btn dialog-btn-cancel">OK</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="wf-loading-modal" style="display:none;">
+                	<div>
+                		<img src="{{public}}/img/ajax-loader.gif"> Loading
+                	</div>
+                </div>
+            </div>
+        </div>
+        <!-- requirejs -->
+        <script data-main="{{public}}/js/app" src="{{public}}/js/vendor/require.js"></script>
+    </body>
+</html>

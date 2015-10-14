@@ -111,6 +111,9 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 	 */
 	var loadWorkflow = function(id) {
 		
+		$g.loadingModal.dialog('open');
+		
+		
 	    // get the workflow
 	    $.ajax({
 	        url : $g.wfpath + '/workflows/' + id,
@@ -121,9 +124,25 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 	        }
 	    })
 	    .done(function(data, status, xhr) {
+	    	
+	    	// set the global workflow
+        	$g.wf = data;
+	    	
 	        console.log(data, xhr, status);
+	        var oset;
+	        try {
+	        	oset = JSON.parse($g.wf.ui);
+	        }
+	        catch(err) {
+	        	oset = null;
+	        }
 	        
-	        // split up the parameters
+	        // position the workarea
+		    $ui.positionWorkarea(oset);
+		    
+		    console.log($g.workarea.position(), $g.workarea.offset());
+	        
+		    // split up the parameters
 	        $.each(data.parameters, function(idx, val) {
 	        	if (val.scope === 'attribute') {
 	        		$g.attributes.push(val);
@@ -138,7 +157,6 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 	        
 	        // wait for jsPlumb to be ready
 	        $g.diagram.ready(function() {
-	        	$g.wf = data;
 	            $item.addItems(data, $g.iconSize);
 	            $item.connectItems(data);
 	            $canvas.init();
@@ -148,6 +166,7 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 	        console.log('FAIL', err);
 	    })
 	    .always(function() {
+	    	$g.loadingModal.dialog('close');
 	    	$ui.positionElements();
 	    });
 	};
