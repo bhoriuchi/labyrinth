@@ -109,14 +109,21 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 	 * load the workflow
 	 * 
 	 */
-	var loadWorkflow = function(id) {
+	var loadWorkflow = function(id, editing, version) {
 		
 		$g.loadingModal.dialog('open');
 		
+		var verDate = (new Date(version)).toISOString();
+		version = '?version=' + version;
+		version = (editing === false) ? version : '?version=0';
+
+		console.log(version);
+		
+		$g.editing = (editing === true) ? true : false;
 		
 	    // get the workflow
 	    $.ajax({
-	        url : $g.wfpath + '/workflows/' + id,
+	        url : $g.wfpath + '/workflows/' + id + version,
 	        method : 'GET',
 	        crossDomain : true,
 	        headers : {
@@ -125,8 +132,14 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 	    })
 	    .done(function(data, status, xhr) {
 	    	
+	    	// create the header
+	    	var header = $g.editing ? data.name + ' - DRAFT' : data.name + ' - Version ' + data.current_version + ' (' + verDate + ')';
+	    	
 	    	// set the global workflow
         	$g.wf = data;
+        	
+    		// set the title
+    		$g.header.html(header);
 	    	
 	        console.log(data, xhr, status);
 	        var oset;
@@ -139,19 +152,11 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 	        
 	        // position the workarea
 		    $ui.positionWorkarea(oset);
-		    
-		    console.log($g.workarea.position(), $g.workarea.offset());
-	        
+
 		    // split up the parameters
 	        $.each(data.parameters, function(idx, val) {
 	        	if (val.scope === 'attribute') {
 	        		$g.attributes.push(val);
-	        	}
-	        	else if (val.scope === 'input') {
-	        		$g.inputs.push(val);
-	        	}
-	        	else if (val.scope === 'output') {
-	        		$g.outputs.push(val);
 	        	}
 	        });
 	        

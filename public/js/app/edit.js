@@ -3,7 +3,7 @@
  * @license MIT
  * 
  */
-define(['jquery', 'wf-global', 'wf-util'], function($, $g, $util) {
+define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $canvas) {
 	
 	
 	var publish = function(force) {
@@ -64,7 +64,10 @@ define(['jquery', 'wf-global', 'wf-util'], function($, $g, $util) {
 	};
 
 
-	var editStep = function(id) {
+	var editStep = function(id, editing) {
+		
+		var draft = (editing === false) ? '' : '?version=0';
+		
 		// get the step
 		var step = $g.steps[id];
 		
@@ -72,35 +75,96 @@ define(['jquery', 'wf-global', 'wf-util'], function($, $g, $util) {
 
 		// open the dialog
 		if (!activity.readonly) {
-			if (activity && activity.source) {
-				$g.codemirror.setValue(activity.source);
-			}
-			else {
-				$g.codemirror.setValue('');
-			}
 			
+			$g.loadingModal.dialog('open');
 			
-			// set the form values
-			$('#wf-step-name').val(step.label);
-			$('#wf-step-timeout').val(step.timeout);
-			$('#wf-step-usecurrent').prop('checked', step.use_current);
-			$('#wf-step-failworkflow').prop('checked', step.failsWorkflow);
-			$('#wf-step-wait').prop('checked', step.waitOnSuccess);
-			$('#wf-step-requirekey').prop('checked', step.requireKey);
-			
-			// determine if fields need to be hidden
-			if (step.waitOnSuccess) {
-				$('#wf-step-requirekey-form').show();
-			}
-			else {
-				$('#wf-step-requirekey').prop('checked', false);
-				$('#wf-step-requirekey-form').hide();
-			}
-			
-			
-			$g.editModal.dialog('option', 'title', 'Edit Step - ' + step.label);
-			$g.editModal.dialog('open');
-			$g.codemirror.refresh();
+	        $.ajax({
+	            url : $g.wfpath + '/steps/' + step.id + draft,
+	            method : 'GET',
+	            crossDomain : true,
+	            headers : {
+	                'Accept' : 'application/json'
+	            },
+	            dataType: 'json',
+	            contentType: 'application/json'
+	        })
+	        .done(function(step, status, xhr) {
+	        	
+	        	$g.steps[id] = step;
+	        	activity = step.activity ? step.activity : step;
+	        	
+				if (activity && activity.source) {
+					$g.codemirror.setValue(activity.source);
+				}
+				else {
+					$g.codemirror.setValue('');
+				}
+				
+				$g.steps[id]._input  = [];
+				$g.steps[id]._output = [];
+	        	
+	        	$.each(activity.parameters, function(paramId, param) {
+	        		if (param.scope === 'input') {
+	        			$g.steps[id]._input.push(param);
+	        		}
+	        		else if (param.scope === 'output') {
+	        			$g.steps[id]._output.push(param);
+	        		}
+	        	});
+				
+				
+				// set the form values
+				$('#wf-step-name').val(step.label);
+				$('#wf-step-timeout').val(step.timeout);
+				$('#wf-step-usecurrent').prop('checked', step.use_current);
+				$('#wf-step-failworkflow').prop('checked', step.failsWorkflow);
+				$('#wf-step-wait').prop('checked', step.waitOnSuccess);
+				$('#wf-step-requirekey').prop('checked', step.requireKey);
+				
+				// determine if fields need to be hidden
+				if (step.waitOnSuccess) {
+					$('#wf-step-requirekey-form').show();
+				}
+				else {
+					$('#wf-step-requirekey').prop('checked', false);
+					$('#wf-step-requirekey-form').hide();
+				}
+				
+				
+				$g.editModal.dialog('option', 'title', 'Edit Step - ' + step.label);
+				$g.editModal.dialog('open');
+				$g.codemirror.refresh();
+				
+				$("#wf-input-list").jsGrid({
+				    width: "100%",
+				    height: "395px",
+				    editing: true,
+				    autoload: true,
+				    data: $g.steps[id]._input,
+				    onItemInserted: function(insert) {
+				    	$("#wf-input-list").jsGrid('editItem', insert.item);
+				    },
+				    fields: $util.ioParameters()
+				});
+				
+				$("#wf-output-list").jsGrid({
+				    width: "100%",
+				    height: "395px",
+				    editing: true,
+				    autoload: true,
+				    data: $g.steps[id]._output,
+				    onItemInserted: function(insert) {
+				    	$("#wf-output-list").jsGrid('editItem', insert.item);
+				    },
+				    fields: $util.ioParameters()
+				});
+	        })
+	        .fail(function(xhr, status, err) {
+	        	console.log('failed', xhr, status, err);
+	        })
+	        .always(function() {
+	        	$g.loadingModal.dialog('close');
+	        });
 		}
 	};
 	

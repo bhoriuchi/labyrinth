@@ -16,8 +16,9 @@ define(
 	function($, $g, $ui, $edit, $item) {
 	// when a node is double clicked
 	$(document).on('dblclick', '.connectable', function() {
+		//console.log('dropped', $(this));
 		// get the id
-		var id   = $(this)[0].id;
+		var id = $(this)[0].id;
 		$edit.editStep(id);
 	});
 	
@@ -75,15 +76,22 @@ define(
                 }
             };
         	
+        	console.log('ui', ui, 'step', step);
+        	
         	// add the step to the workspace
-            var uiStep = $item.addItem(step, null, ui.offset, $g.iconSize);
+            var uiStep   = $item.addItem(step, null, ui.offset, $g.iconSize);
+            var position = {
+            	left: ui.offset.left + ($g.workarea.width() / 2),
+            	top: ui.offset.top + ($g.workarea.height() / 2)
+            };
             
             // create the step
             $item.newItem($g.wfpath + '/steps', {
             	activity: ui.draggable.attr('wfActivity'),
             	label: step.label,
             	workflow: $g.wf.id,
-            	type: step.activity.type
+            	type: step.activity.type,
+            	ui: JSON.stringify(position)
             }, uiStep);
         }
     });

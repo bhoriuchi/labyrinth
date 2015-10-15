@@ -7,16 +7,19 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 	
 	var toggleMenu = function() {
 		
-	    var show = ($g.menu.css('display') === 'none') ? false : true;
-
+	    var show    = ($g.menu.css('display') === 'none') ? false : true;
+	    $g.menuOpen = !show;
+	    
 	    if (show) {
 	        $g.menu.hide('slide', {
 	            direction : 'left'
 	        }, 200);
+	        
 	        $g.menuToggle.animate({
-	            left : '-=' + $g.menu.width()
-	        }, 200);
-	        $g.menuToggle.removeClass('rotate180').addClass('rotate0');
+	            left : 0
+	        }, 200)
+	        .removeClass('rotate180')
+	        .addClass('rotate0');
 	    }
 	    else {
 
@@ -25,9 +28,10 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 	        }, 200);
 	                        
 	        $g.menuToggle.animate({
-	            left : '+=' + $g.menu.width()
-	        }, 200);
-	        $g.menuToggle.removeClass('rotate0').addClass('rotate180');
+	            left : $g.menu.outerWidth() + 2
+	        }, 200)
+	        .removeClass('rotate0')
+	        .addClass('rotate180');
 	    }
 	    
 	    if (!$g.menuLoaded) {
@@ -42,8 +46,6 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 	                activeHeader: 'ui-icon-circle-triangle-s'
 	            }
 	        });
-	    }
-	    else {
 	        $g.menuLoaded = true;
 	    }
 	};
@@ -53,11 +55,41 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 	 * position the menu in the viewport
 	 */
 	var positionElements = function() {
+		
+		// update the height of the viewport
+		$g.viewport.css('height', $(window).height());
+		$g.menu.css('height', $(window).height());
+		
+		if ($g.menuLoaded) {
+			$g.itemSelect.accordion('refresh');
+		}
+		
 	    $g.menu.position({
 	        my: 'left top',
 	        at: 'left top',
 	        of: $g.viewport
 	    });
+	    
+	    
+		if (!$g.menuOpen) {
+			
+			// add the menu toggle
+			$g.menuToggle.position({
+				my : 'left center',
+				at : 'left center',
+				of : $g.viewport
+			});
+		}
+		else {
+			// add the menu toggle
+			$g.menuToggle.position({
+				my : 'left center',
+				at : 'right center',
+				of : $g.menu
+			});
+		}
+	    
+
 	    
 		$g.toolbar.show().position({
 			my: 'center bottom',
@@ -67,6 +99,7 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 		
 		$g.droparea.show()
 		.width($g.viewport.width() - $g.menu.width())
+		.height($g.viewport.height())
 		.position({
 			my: 'right bottom',
 			at: 'right bottom',
@@ -131,6 +164,8 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 	 */
 	var positionWorkarea = function(position) {
 		
+		$g.viewport.css('height', $(window).height());
+		
 		// reposition the work area
 		$g.workarea.position({
 			using: function(pos, fb) {
@@ -141,7 +176,7 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 				}
 				else {
 					$(this).css('top', -(fb.element.height / 2 ));
-					$(this).css('left', -(fb.element.width / 2 ));					
+					$(this).css('left', -(fb.element.width / 2 ));
 				}
 
 			},

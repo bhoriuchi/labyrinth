@@ -41,36 +41,7 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 	};
 	
 	
-	var _ioParameters = function() {
-		return [
-		    {
-		    	name: 'name',
-		    	title: 'Name',
-		    	type: 'text'
-		    },
-		    {
-		    	name: 'type',
-		    	title: 'Type',
-		    	type: 'text'
-		    },
-		    {
-		    	name: 'mapAttribute',
-		    	title: 'Bind Attribute',
-		    	type: 'select',
-		    	valueField: 'id',
-		    	textField: 'name',
-		    	items: [{id: '', name: 'None'}].concat($.pluck($g.attributes, ['id', 'name']))
-		    },
-		    {
-		    	name: 'description',
-		    	title: 'Description',
-		    	type: 'text'
-		    },
-		    {
-		    	type: 'control'
-		    }
-	    ];
-	};
+
 	
 	
 	/**
@@ -200,6 +171,7 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 			},
 			stop : function(p) {
 				_dragElement = null;
+				$g.diagram.repaintEverything();
 			}
 		});
 	};
@@ -210,6 +182,7 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 		// create the tabs
 		$g.editTabs.tabs({
 	        activate: function(event, ui) {
+	        	
 	        	if (ui.newPanel.attr('id') === 'wf-tab-input') {
 	            	$util.removeBlanks($g.inputs);
 	            	$("#wf-input-list").jsGrid("render");
@@ -223,9 +196,14 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 	            }
 	            
 	            $g.activetab = $g.editTabs.tabs("option","active");
+	            
+	        	if (localStorage) {
+	        		localStorage.setItem('labyrinth-wf-tab-active', $g.activetab);
+	        	}
+	            
 	        },
 	        active: $g.editTabs.tabs({
-	        	active: $g.activetab
+	        	active: localStorage ? localStorage.getItem('labyrinth-wf-tab-active') : $g.activetab
 	        })
 		});
 		
@@ -255,8 +233,8 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 		    autoload: true,
 		    data: $g.attributes,
 		    onItemUpdated: function(update) {
-		    	$("#wf-input-list").jsGrid('option', 'fields', _ioParameters());
-		    	$("#wf-output-list").jsGrid('option', 'fields', _ioParameters());
+		    	$("#wf-input-list").jsGrid('option', 'fields', $util.ioParameters());
+		    	$("#wf-output-list").jsGrid('option', 'fields', $util.ioParameters());
 		    },
 		    onItemInserted: function(insert) {
 		    	$("#wf-attributes-list").jsGrid('editItem', insert.item);
@@ -271,30 +249,10 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 		    ]
 		});
 		
-		$("#wf-input-list").jsGrid({
-		    width: "100%",
-		    height: "395px",
-		    editing: true,
-		    autoload: true,
-		    data: $g.inputs,
-		    onItemInserted: function(insert) {
-		    	$("#wf-input-list").jsGrid('editItem', insert.item);
-		    },
-		    fields: _ioParameters()
-		});
+
 		
 		
-		$("#wf-output-list").jsGrid({
-		    width: "100%",
-		    height: "395px",
-		    editing: true,
-		    autoload: true,
-		    data: $g.outputs,
-		    onItemInserted: function(insert) {
-		    	$("#wf-output-list").jsGrid('editItem', insert.item);
-		    },
-		    fields: _ioParameters()
-		});
+
 		
 		/**
 		 * bind the jsPlumb events

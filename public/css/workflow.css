@@ -1,8 +1,4 @@
 
-body {
-    padding-top: 50px;
-    padding-bottom: 20px;
-}
         
 .ui-widget * {
     outline: none;
@@ -54,6 +50,11 @@ div.itemListLabel {
 	max-height: 20px; /* fallback */
 }
 
+.container {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
 
 
 div.centered {
@@ -276,6 +277,8 @@ div.startItem, div.endItem p {
 .new-param {
 	float: right;
 	margin-bottom: 8px;
+	width: 120px;
+	text-align: left;
 }
 
 #wf-editTabs { 
@@ -358,10 +361,13 @@ div.startItem, div.endItem p {
 }
 
 #wf-header {
-	margin-top: 0px;
-	padding: 0px;
-	font-family: Verdana
-	font-size: 100px;
+	font-family: Verdana;
+    color: #999;
+	position: absolute;
+	top:10px;
+	left:10px;
+	z-index: 1;
+	font-size: 20px;
 }
 
 #wf-viewport {
@@ -379,8 +385,6 @@ div.startItem, div.endItem p {
 	top: 0;
 	left: 0;
 	z-index: -1;
-	height: 600px;
-	width: 20px;
 	background: rgba(0, 0, 0, 0.5);
 }
 

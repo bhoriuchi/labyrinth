@@ -54,7 +54,10 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 		    		$g.editModal.dialog( "close" );
 				}
 		    },
-		]
+		],
+		close: function() {
+			$("#wf-input-list").jsGrid('destroy');
+		}
 	});
 	
 	// create the edit dialog

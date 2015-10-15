@@ -3,7 +3,7 @@
  * @license MIT
  * 
  */
-define(['jquery'], function($) {
+define(['jquery', 'wf-global'], function($, $g) {
 	
 	$.pluck = function(arr, key) {
 	    return $.map(arr, function(e) {
@@ -49,10 +49,43 @@ define(['jquery'], function($) {
 		return null;
 	};
 	
+	
+	var ioParameters = function() {
+		return [
+		    {
+		    	name: 'name',
+		    	title: 'Name',
+		    	type: 'text'
+		    },
+		    {
+		    	name: 'type',
+		    	title: 'Type',
+		    	type: 'text'
+		    },
+		    {
+		    	name: 'mapAttribute',
+		    	title: 'Bind Attribute',
+		    	type: 'select',
+		    	valueField: 'id',
+		    	textField: 'name',
+		    	items: [{id: '', name: 'None'}].concat($.pluck($g.attributes, ['id', 'name']))
+		    },
+		    {
+		    	name: 'description',
+		    	title: 'Description',
+		    	type: 'text'
+		    },
+		    {
+		    	type: 'control'
+		    }
+	    ];
+	};
+	
 	// return functions
 	return {
 		getURLParameter: getURLParameter,
 		removeBlanks: removeBlanks,
-		findStep: findStep
+		findStep: findStep,
+		ioParameters: ioParameters
 	};
 });

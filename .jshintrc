@@ -133,6 +133,7 @@
 		"document": false,
 		"window": false,
 		"requirejs": false,
-		"define": false
+		"define": false,
+		"localStorage": false
 	}
 }

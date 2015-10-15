@@ -10,30 +10,35 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	 */
 	var newItem = function(path, body, step) {
 		
-		var msg;
-		
-		var id       = step.attr('id');
+		var msg, id = step.attr('id');
 
-		
 		if (body.type === 'task') {
 			
 			if (body.activity === 'task') {
-				console.log('new task');
+				msg = {
+					label: body.label,
+					type: 'task',
+					workflow: body.workflow,
+					source: '',
+					ui: body.ui
+				};
 			}
 			else {
 				msg = {
 					label: body.label,
+					type: body.type,
 					activity: body.activity,
-					workflow: body.workflow
+					workflow: body.workflow,
+					ui: body.ui
 				};
 			}
 		}
 		
-		
+		console.log('messageBody', msg);
 		
 		if (msg) {
 	        $.ajax({
-	            url : path + '?maxdepth=0',
+	            url : path + '?maxdepth=1',
 	            method : 'POST',
 	            crossDomain : true,
 	            headers : {
@@ -46,6 +51,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	        .done(function(data, status, xhr) {
 	        	step.attr('wfItemId', data.id);
 	        	$g.steps[id] = data;
+	        	console.log($g.steps);
 	        })
 	        .fail(function(xhr, status, err) {
 	        	console.log('failed', xhr, status, err);
@@ -241,9 +247,6 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	var addItems = function(data, size) {
 
 		var prevElement;
-		
-		// set the title
-		$g.header.html(data.name);
 		
 		// create the step divs and get the start/end ids
 		$.each(data.steps, function(index, step) {
