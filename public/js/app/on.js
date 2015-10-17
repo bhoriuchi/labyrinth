@@ -64,17 +64,27 @@ define(
     	accept: '.menuObject',
         drop: function(e, ui) {
         	
+        	var activityId = ui.draggable.attr('wfActivityId');
+        	var workflowId = ui.draggable.attr('wfWorkflowId');
+        	
+        	console.log('wfid', workflowId);
+        	
         	// remove the helper
         	ui.helper.remove();
         	
         	// create the step
         	var step = {
-                id: ui.draggable.attr('wfItemId'),
+        		workflow: $g.wf.id,
                 label: ui.draggable.attr('wfItemLabel'),
-                activity: {
-                    type: ui.draggable.attr('wfItemType')
-                }
+                type: ui.draggable.attr('wfItemType')
             };
+        	
+        	if (activityId && activityId !== '') {
+        		step.activity = activityId;
+        	}
+        	else if (workflowId && workflowId !== '') {
+        		step.subWorkflow = workflowId;
+        	}
         	
         	console.log('ui', ui, 'step', step);
         	
@@ -85,14 +95,10 @@ define(
             	top: ui.offset.top + ($g.workarea.height() / 2)
             };
             
+            step.ui = JSON.stringify(position);
+            
             // create the step
-            $item.newItem($g.wfpath + '/steps', {
-            	activity: ui.draggable.attr('wfActivity'),
-            	label: step.label,
-            	workflow: $g.wf.id,
-            	type: step.type,
-            	ui: JSON.stringify(position)
-            }, uiStep);
+            $item.newItem($g.wfpath + '/steps', step, uiStep);
         }
     });
     

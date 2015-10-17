@@ -27,6 +27,33 @@ define(['jquery', 'wf-global'], function($, $g) {
 	};
 
 
+	/**
+	 * function to check if a path exists in an object and return the value
+	 */
+	var exists = function(obj, path, nullValue) {
+		
+		nullValue = (!nullValue && nullValue !== '') ? null : nullValue;
+		
+		// check that the object exists
+		if (!obj || typeof(obj) !== 'object' || Array.isArray(obj) || typeof(path) !== 'string') {
+			return nullValue;
+		}
+		
+		// split the path
+		path = path.split('.');
+		
+		for(var i = 0; i < path.length; i++) {
+			
+			if (obj[path[i]]) {
+				obj = obj[path[i]];
+			}
+			else {
+				return nullValue;
+			}
+		}
+		return obj;
+	};
+	
 
 	var removeBlanks = function(obj) {
 		for (var i = obj.length - 1; i >= 0; i--) {
@@ -86,6 +113,7 @@ define(['jquery', 'wf-global'], function($, $g) {
 	
 	// return functions
 	return {
+		exists: exists,
 		getURLParameter: getURLParameter,
 		removeBlanks: removeBlanks,
 		findStep: findStep,

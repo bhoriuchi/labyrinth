@@ -91,6 +91,7 @@ div.itemLabel {
 	max-height: 20px; /* fallback */
 }
 
+
 div.startItem {
 	background: url(../img/start.svg);
 	background-size: cover;

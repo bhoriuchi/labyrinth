@@ -24,7 +24,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 			msg.activity = body.activity;
 		}
 		else if (body.type === 'workflow') {
-			msg.subWorkflow = body.activity;
+			msg.subWorkflow = body.subWorkflow;
 		}
 		else {
 			msg.source = '';
@@ -173,12 +173,12 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		
 		// look at the activity type and add the appropriate endpoints
 		// an styles
-		if (activity.type === 'start') {
+		if (step.type === 'start') {
 			endpoint = {
 				success: $g.conn.success
 					};
 		}
-		else if (activity.type === 'end') {
+		else if (step.type === 'end') {
 			endpoint = {
 				target: $g.conn.target
 			};
@@ -193,15 +193,16 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		}
 		
 		// create an item class
-		itemClass = sizeClass + ' item ' + activity.type + 'Item';
+		itemClass = sizeClass + ' item ' + step.type + 'Item';
 
-		
+		console.log(step);
 		// create the html for the step
 		var stepHTML = 	'<div id="' + newId +
 						'" wfItemLabel="' + step.label +
-						'" wfItemType="' + activity.type +
+						'" wfItemType="' + step.type +
 						'" wfItemId="' + step.id +
-						'" wfActivity="' + activity.id +
+						'" wfActivityId="' + $util.exists(step, 'activity.id', '') +
+						'" wfWorkflowId="' + $util.exists(step, 'workflow.id', '') +
 						'" class="' + sizeClass + ' connectable magnetized">' +
 						'    <div class="' + itemClass + '"></div>' +
 						'    <div id="itemlabel-' + newId + '" class="itemLabel">' +

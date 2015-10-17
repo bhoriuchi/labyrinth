@@ -3,7 +3,7 @@
  * @license MIT
  * 
  */
-define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g, $ui, $item, $canvas) {
+define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], function($, $g, $ui, $item, $canvas, $util) {
 	
 	/**
 	 * add new node html to menu
@@ -11,17 +11,20 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 	var _menuNode = function(node) {
 		return 	'<li class="itemList">' +
 				'<div class="menuObject" ' +
-				'wfItemLabel="' + node.name + '" ' +
+				'wfItemLabel="' + node.label + '" ' +
 				'wfItemType="' + node.type + '" ' +
-				'wfActivity="' + node.id + '" ' +
+				'wfActivityId="' + $util.exists(node, 'activityId', '') + '" ' +
+				'wfWorkflowId="' + $util.exists(node, 'workflowId', '') + '" ' +
 				'wfItemId="">' +
 				'<div class="centered item-sm ' + node.type + 'Item"></div>' +
-				'<div class="itemListLabel">' + node.name + '</div>' +
+				'<div class="itemListLabel">' + node.label + '</div>' +
 				'</div>' +
 				'</li>';
 	};
 
-	
+	/**
+	 * loads the data types
+	 */
 	var loadDataTypes = function() {
 		
         // get the workflows
@@ -48,22 +51,19 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 		
 		// condition
 		$('#generalObjects').append(_menuNode({
-			id: 'condition',
-			name: 'Condition',
+			label: 'Condition',
 			type: 'condition'
 		}));
 		
 		// loop
 		$('#generalObjects').append(_menuNode({
-			id: 'loop',
-			name: 'Loop',
+			label: 'Loop',
 			type: 'loop'
 		}));
 		
 		// new task
 		$('#generalObjects').append(_menuNode({
-			id: 'task',
-			name: 'Task',
+			label: 'Task',
 			type: 'task'
 		}));
 
@@ -82,10 +82,18 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 	        for (var i = 0; i < $g.activities.length; i++) {
 	            var a = $g.activities[i];
 	            if (a.type === 'end') {
-	            	$('#generalObjects').append(_menuNode(a));
+	            	$('#generalObjects').append(_menuNode({
+	            		label: 'End',
+	            		type: a.type,
+	            		activityId: a.id
+	            	}));
 	            }
 	            else if (a.type === 'task') {
-	            	$('#taskObjects').append(_menuNode(a));
+	            	$('#taskObjects').append(_menuNode({
+	            		label: a.name,
+	            		type: a.type,
+	            		activityId: a.id
+	            	}));
 	            }
 	        }
 	        
@@ -105,9 +113,9 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 	            for (var i = 0; i < $g.workflows.length; i++) {
 	                var w = $g.workflows[i];
 	            	$('#workflowObjects').append(_menuNode({
-	            		id: w.id,
-	            		name: w.name,
-	            		type: 'workflow'
+	            		label: w.name,
+	            		type: 'workflow',
+	            		workflowId: w.id
 	            	}));
 	            }
 	            
