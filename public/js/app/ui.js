@@ -41,11 +41,20 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 	            clearStyle: true,
 	            autoHeight: false,
 	            animate: 200,
+	            collapsible: false,
 	            icons: {
 	                header: 'ui-icon-circle-triangle-e',
 	                activeHeader: 'ui-icon-circle-triangle-s'
+	            },
+	            active: (localStorage && localStorage.getItem($g.lsMenu)) ?
+	            		parseInt(localStorage.getItem($g.lsMenu), 10) : 0,
+	            activate: function(event, ui) {
+	            	if (localStorage) {
+	            		localStorage.setItem($g.lsMenu, $(this).accordion('option', 'active'));
+	            	}
 	            }
 	        });
+	        
 	        $g.menuLoaded = true;
 	    }
 	};

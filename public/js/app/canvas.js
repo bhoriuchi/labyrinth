@@ -88,7 +88,7 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 			endpoint: "Dot",
 			paintStyle: endpointPaintStyle,
 			isSource: true,
-			connector: [ "Flowchart", { stub: [30, 30], gap: 5, cornerRadius: 5, alwaysRespectStubs: true } ],
+			connector: [ "Flowchart", { stub: [30, 30], gap: [5, 5], cornerRadius: 5, alwaysRespectStubs: true} ],
 			connectorStyle: {
 				lineWidth: 2,
 				strokeStyle: color,
@@ -198,12 +198,12 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 	            $g.activetab = $g.editTabs.tabs("option","active");
 	            
 	        	if (localStorage) {
-	        		localStorage.setItem('labyrinth-wf-tab-active', $g.activetab);
+	        		localStorage.setItem($g.lsTab, $g.activetab);
 	        	}
 	            
 	        },
 	        active: $g.editTabs.tabs({
-	        	active: localStorage ? localStorage.getItem('labyrinth-wf-tab-active') : $g.activetab
+	        	active: localStorage ? localStorage.getItem($g.lsTab) : $g.activetab
 	        })
 		});
 		
@@ -242,7 +242,14 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 		    },
 		    fields: [
 		        { name: 'name', title: 'Name', type: 'text' },
-		        { name: 'type', title: 'Type', type: 'text' },
+			    {
+			    	name: 'dataTypeId',
+			    	title: 'Type',
+			    	type: 'select',
+			    	valueField: 'id',
+			    	textField: 'name',
+			    	items: $.pluck($g.dataTypes, ['id', 'name'])
+			    },
 		        { name: 'defaultValue', title: 'Default', type: 'text' },
 		        { name: 'description', title: 'Description', type: 'text' },
 		        { type: 'control' }

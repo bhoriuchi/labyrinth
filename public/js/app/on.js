@@ -90,7 +90,7 @@ define(
             	activity: ui.draggable.attr('wfActivity'),
             	label: step.label,
             	workflow: $g.wf.id,
-            	type: step.activity.type,
+            	type: step.type,
             	ui: JSON.stringify(position)
             }, uiStep);
         }

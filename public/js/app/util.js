@@ -58,9 +58,12 @@ define(['jquery', 'wf-global'], function($, $g) {
 		    	type: 'text'
 		    },
 		    {
-		    	name: 'type',
+		    	name: 'dataTypeId',
 		    	title: 'Type',
-		    	type: 'text'
+		    	type: 'select',
+		    	valueField: 'id',
+		    	textField: 'name',
+		    	items: $.pluck($g.dataTypes, ['id', 'name'])
 		    },
 		    {
 		    	name: 'mapAttribute',

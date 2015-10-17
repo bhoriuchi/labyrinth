@@ -10,28 +10,24 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	 */
 	var newItem = function(path, body, step) {
 		
-		var msg, id = step.attr('id');
+		var id = step.attr('id');
 
-		if (body.type === 'task') {
-			
-			if (body.activity === 'task') {
-				msg = {
-					label: body.label,
-					type: 'task',
-					workflow: body.workflow,
-					source: '',
-					ui: body.ui
-				};
-			}
-			else {
-				msg = {
-					label: body.label,
-					type: body.type,
-					activity: body.activity,
-					workflow: body.workflow,
-					ui: body.ui
-				};
-			}
+		// basic message body
+		var msg = {
+			label: body.label,
+			type: body.type,
+			workflow: body.workflow,
+			ui: body.ui
+		};
+		
+		if (body.type === 'task' && body.activity !== 'task') {
+			msg.activity = body.activity;
+		}
+		else if (body.type === 'workflow') {
+			msg.subWorkflow = body.activity;
+		}
+		else {
+			msg.source = '';
 		}
 		
 		console.log('messageBody', msg);
@@ -154,8 +150,8 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				prev = $g.workarea;
 				posObj = {
 					using: function(pos, fb) {
-						$(this).css('top', (fb.target.height / 2) + 20);
-						$(this).css('left', (fb.target.width / 2) + 20);
+						$(this).css('top', (fb.target.height / 2) + 100);
+						$(this).css('left', (fb.target.width / 2) + 100);
 					}
 				};
 			}

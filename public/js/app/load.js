@@ -21,6 +21,25 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 				'</li>';
 	};
 
+	
+	var loadDataTypes = function() {
+		
+        // get the workflows
+        $.ajax({
+            url : $g.wfpath + '/datatypes',
+            method : 'GET',
+            crossDomain : true,
+            headers : {
+                Accept : 'application/json'
+            }
+        })
+        .done(function(data, status, xhr) {
+            $g.dataTypes = data;
+        })
+        .fail(function(xhr, status, err) {
+            console.log('ERROR', err);
+        });
+	};
 
 	/**
 	 * load menu items
@@ -116,8 +135,6 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 		var verDate = (new Date(version)).toISOString();
 		version = '?version=' + version;
 		version = (editing === false) ? version : '?version=0';
-
-		console.log(version);
 		
 		$g.editing = (editing === true) ? true : false;
 		
@@ -155,7 +172,8 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 
 		    // split up the parameters
 	        $.each(data.parameters, function(idx, val) {
-	        	if (val.scope === 'attribute') {
+	        	if (val.type === 'attribute') {
+	        		val.dataTypeId = val.dataType.id;
 	        		$g.attributes.push(val);
 	        	}
 	        });
@@ -180,7 +198,8 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas'], function($, $g,
 	
 	return {
 		loadWorkflow: loadWorkflow,
-		loadMenuItems: loadMenuItems
+		loadMenuItems: loadMenuItems,
+		loadDataTypes: loadDataTypes
 	};
 	
 });

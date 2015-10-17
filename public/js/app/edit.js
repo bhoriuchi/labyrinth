@@ -23,6 +23,9 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	        contentType: 'application/json'
 	    })
 	    .done(function(data, status, xhr) {
+	    	
+	    	console.log(data, status, xhr);
+	    	
 	    	$g.confirmModal.dialog('close');
 	    	$('#wf-ok-modal-detail').html('Successfully published version ' + data[0].current_version);
     		$g.okModal.dialog('option', 'title', ' Successfully Published!');
@@ -42,7 +45,8 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	    		$g.confirmModal.dialog('open');
 	    	}
 	    	else {
-	    		$('#wf-error-modal-detail').html(xhr.responseJSON.message);
+	    		$g.confirmModal.dialog('close');
+	    		$('#wf-error-modal-detail').html(xhr.responseJSON.message + '<br><br>' + xhr.responseJSON.details);
 	    		$g.errorModal.dialog('option', 'title', 'Error');
 	    		$g.errorModal.dialog('open');
 	    	}
@@ -91,7 +95,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	        .done(function(step, status, xhr) {
 	        	
 	        	$g.steps[id] = step;
-	        	activity = step.activity ? step.activity : step;
+	        	activity = step.activity || step.subWorkflow || step;
 	        	
 				if (activity && activity.source) {
 					$g.codemirror.setValue(activity.source);
@@ -103,11 +107,15 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				$g.steps[id]._input  = [];
 				$g.steps[id]._output = [];
 	        	
-	        	$.each(activity.parameters, function(paramId, param) {
-	        		if (param.scope === 'input') {
+	        	$.each(step.parameters, function(paramId, param) {
+	        		
+	        		// create a new field to reference the data type id
+	        		param.dataTypeId = param.dataType.id;
+	        		
+	        		if (param.type === 'input') {
 	        			$g.steps[id]._input.push(param);
 	        		}
-	        		else if (param.scope === 'output') {
+	        		else if (param.type === 'output') {
 	        			$g.steps[id]._output.push(param);
 	        		}
 	        	});
@@ -133,7 +141,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				
 				$g.editModal.dialog('option', 'title', 'Edit Step - ' + step.label);
 				$g.editModal.dialog('open');
-				$g.codemirror.refresh();
+
 				
 				$("#wf-input-list").jsGrid({
 				    width: "100%",
@@ -158,6 +166,18 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    },
 				    fields: $util.ioParameters()
 				});
+				
+				if (step.type !== 'workflow') {					
+					$('#wf-tab-source-tab').show();
+					$g.codemirror.refresh();
+				}
+				else {
+					$('#wf-tab-source-tab').hide();
+					
+					if ($g.editTabs.tabs('option', 'active') === 3) {
+						$g.editTabs.tabs('option', 'active', '0');
+					}
+				}
 	        })
 	        .fail(function(xhr, status, err) {
 	        	console.log('failed', xhr, status, err);

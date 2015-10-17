@@ -58,7 +58,12 @@ define(
 		if (id) {
 		    $load.loadWorkflow(id, editing, version);
 		    $load.loadMenuItems();
+		    $load.loadDataTypes();
 
+		}
+		else {
+			$ui.positionWorkarea();
+			$ui.positionElements();
 		}
 	});
 });
