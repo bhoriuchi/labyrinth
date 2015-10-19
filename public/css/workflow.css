@@ -215,6 +215,17 @@ div.startItem, div.endItem p {
 	width:30px;
 }
 
+.prompt-message {
+	display:inline;
+	height: 175px;
+	margin-top:25px;
+}
+
+.wf-dialog {
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+
 .dialog-btn {
 	width: 100px;
 }
@@ -332,6 +343,12 @@ div.startItem, div.endItem p {
 
 .gi-md {
 	font-size: 15px;
+}
+
+.fa-md {
+	font-size: 20px;
+	width: 40px;
+	height: 40px;
 }
 
 

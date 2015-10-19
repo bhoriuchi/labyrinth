@@ -23,32 +23,17 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	        contentType: 'application/json'
 	    })
 	    .done(function(data, status, xhr) {
-	    	
-	    	console.log(data, status, xhr);
-	    	
 	    	$g.confirmModal.dialog('close');
-	    	$('#wf-ok-modal-detail').html('Successfully published version ' + data[0].current_version);
-    		$g.okModal.dialog('option', 'title', ' Successfully Published!');
-    		$g.okModal.dialog('open');
-	    	console.log('published',data);
+	    	$util.okDialog('Successfully Published!', 'Successfully published version ' + data[0].current_version);
 	    })
 	    .fail(function(xhr, status, err) {
 	    	
 	    	if (xhr.responseJSON && xhr.responseJSON.error === 'ER_COULD_NOT_PUBLISH_RELATION') {
-
-	    		$('#wf-confirm-modal-detail').html('One or more dependents require publishing in order to publish this workflow. Select OK to force dependent publishing or Cancel to quit');
-	    		$('#wf-confirm-button').off();
-	    		$('#wf-confirm-button').on('click', function() {
-	    			publish(true);
-	    		});
-	    		$g.confirmModal.dialog('option', 'title', ' Force Publish?');
-	    		$g.confirmModal.dialog('open');
+	    		$util.confirmDialog(' Force Publish?', 'One or more dependents require publishing in order to publish this workflow. Select OK to force dependent publishing or Cancel to quit', publish, [true]);
 	    	}
 	    	else {
 	    		$g.confirmModal.dialog('close');
-	    		$('#wf-error-modal-detail').html(xhr.responseJSON.message + '<br><br>' + xhr.responseJSON.details);
-	    		$g.errorModal.dialog('option', 'title', 'Error');
-	    		$g.errorModal.dialog('open');
+	    		$util.errorDialog('Error', xhr.responseJSON.message + '<br><br>' + xhr.responseJSON.details);
 	    	}
 	    })
 	    .always(function() {
@@ -65,6 +50,81 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		$g.wfModal.dialog('option', 'title', 'Edit Workflow - ' + $g.wf.name);
 		$g.wfModal.dialog('open');
 		$("#wf-attributes-list").jsGrid("render");
+	};
+	
+	
+	var newWorkflow = function() {
+		
+		// add the form
+		$('#wf-prompt-modal-detail').html('<form class="form-horizontal">' +
+				'<div class="form-group">' +
+				'    <label for="wf-new-name" data-toggle="tooltip" title="New workflow name" class="control-label col-xs-3">Name:</label>' +
+                '    <div class="col-xs-9">' +
+                '        <input id="wf-new-name" type="text" name="wf-new-name" value="" class="form-control">' +
+                '    </div>' +
+				'    <label for="wf-new-description" data-toggle="tooltip" title="New workflow description" class="control-label col-xs-3">Description:</label>' +
+                '    <div class="col-xs-9">' +
+                '        <input id="wf-new-description" type="text" name="wf-new-description" value="" class="form-control">' +
+                '    </div>' +
+            	'</div>');
+		
+		// bind the click operation
+		$('#wf-prompt-ok-button').off();
+		$('#wf-prompt-ok-button').on('click', function() {
+			
+			// get the form values
+			var name = $('#wf-new-name').val();
+			var desc = $('#wf-new-description').val() || '';
+			
+			// check for a name
+			if (!name || name === '') {
+				$util.errorDialog('Missing Input', 'A new workflow name is required');
+				return false;
+			}
+			
+			// close the prompt modal and open the loading one
+			$g.promptModal.dialog('close');
+			$g.loadingModal.dialog('open');
+			
+			// create a new message body
+			var msg = {
+				name: name,
+				description: desc
+			};
+
+	        $.ajax({
+	            url : $g.wfpath + '/workflows',
+	            method : 'POST',
+	            crossDomain : true,
+	            headers : {
+	                'Accept' : 'application/json'
+	            },
+	            dataType: 'json',
+	            contentType: 'application/json',
+	            data: JSON.stringify(msg)
+	        })
+	        .done(function(data, status, xhr) {
+	        	
+	        	if (data.id) {
+	        		window.location = '/wf?id=' + data.id + '&editing=true';
+	        	}
+	        	else {
+	        		$g.promptModal.dialog('close');
+	        		$util.errorDialog('Failed', 'Failed to create a new workflow');
+	        	}
+	        })
+	        .fail(function(xhr, status, err) {
+	        	$util.errorDialog('Failed', 'Failed to create a new workflow');
+	        	console.log('failed', xhr, status, err);
+	        })
+	        .always(function() {
+	        	$g.loadingModal.dialog('close');
+	        });
+		});
+		
+		// change the header and open
+		$g.promptModal.dialog('option', 'title', 'New Workflow');
+		$g.promptModal.dialog('open');
 	};
 
 
@@ -209,6 +269,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	
 	
 	return {
+		newWorkflow: newWorkflow,
 		editStep: editStep,
 		publish: publish,
 		editWorkflow: editWorkflow,

@@ -144,6 +144,26 @@ define(['jquery', 'wf-global', 'jquery-ui'], function($, $g) {
 	
 	
 	// create the edit dialog
+	$g.promptModal.dialog({
+		autoOpen: false,
+		height: $g.okheight,
+		width: $g.okwidth,
+		modal: true,
+		draggable: true,
+		closeText: false,
+		position: {
+			my: 'center top',
+			at: 'center top' + $g.smmodaltop,
+			of: $(document)
+		}
+	})
+	.parent()
+	.find('.ui-dialog-titlebar')
+	.prepend('<span class="fa fa-question-circle pull-left"></span>');
+	
+	
+	
+	// create the edit dialog
 	$g.okModal.dialog({
 		autoOpen: false,
 		height: $g.okheight,

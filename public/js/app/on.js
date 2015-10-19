@@ -50,6 +50,11 @@ define(
 		$edit.versionOptions();
 	});
 	
+	$g.toolbarNew.on('click', function() {
+		$edit.newWorkflow();
+	});
+	
+	
 	$('#wf-publish-btn').on('click', function() {
 		$edit.publish();
 		return false;

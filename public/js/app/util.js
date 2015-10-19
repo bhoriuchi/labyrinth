@@ -111,8 +111,43 @@ define(['jquery', 'wf-global'], function($, $g) {
 	    ];
 	};
 	
+	var errorDialog = function(title, message) {
+		$('#wf-error-modal-detail').html(message);
+		$g.errorModal.dialog('option', 'title', title);
+		$g.errorModal.dialog('open');
+	};
+	
+	var okDialog = function(title, message) {
+    	$('#wf-ok-modal-detail').html(message);
+		$g.okModal.dialog('option', 'title', title);
+		$g.okModal.dialog('open');
+	};
+	
+	var confirmDialog = function(title, message, callback, args) {
+		args = args || null;
+		args = Array.isArray(args) ? args : [args];
+		$('#wf-confirm-button').off();
+		
+		$('#wf-confirm-button').on('click', function() {
+			if (typeof(callback) === 'function') {
+				callback.apply(null, args);
+			}
+			else {
+				$g.confirmModal.dialog('close');
+			}
+		});
+		
+		$('#wf-confirm-modal-detail').html(message);
+		$g.confirmModal.dialog('option', 'title', title);
+		$g.confirmModal.dialog('open');
+	};
+	
+	
 	// return functions
 	return {
+		confirmDialog: confirmDialog,
+		okDialog: okDialog,
+		errorDialog: errorDialog,
 		exists: exists,
 		getURLParameter: getURLParameter,
 		removeBlanks: removeBlanks,
