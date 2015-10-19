@@ -14,6 +14,42 @@ define(
 	    'jquery-panzoom'
 	],
 	function($, $g, $ui, $edit, $item) {
+	
+	// bind an on change for the import type selector
+	$(document).on('change', '[wfImportAttrId]', function() {
+		
+		var id     = $(this).attr('wfImportAttrId');
+		var asform = $('#import_as_' + id);
+		var ogform = $('#import_og_' + id);
+		
+		if (this.value === 'merge') {
+			var html = '<select id="import_val_' + id + '" class="attr-form">';
+			
+			$.each($g.attributes, function(itx, attr) {
+				
+				html += '<option value="' + attr.id + '"';
+				
+				if (attr.name === ogform.val()) {
+					html += 'selected';
+				}
+				
+				html += '>' + attr.name + '</option>';
+			});
+			
+			html += '</select>';
+			
+			asform.html(html);
+
+		}
+		else if (this.value === 'import') {
+			asform.html('<input id="import_val_' + id + '" type="text" value="' + ogform.val() + '" class="attr-form">');
+		}
+		else if (this.value === 'omit') {
+			asform.html('<input type="text" value="" class="attr-form" disabled>');
+		}
+	});
+		
+	
 	// when a node is double clicked
 	$(document).on('dblclick', '.connectable', function() {
 		//console.log('dropped', $(this));
@@ -99,8 +135,6 @@ define(
             	left: ui.offset.left + ($g.workarea.width() / 2),
             	top: ui.offset.top + ($g.workarea.height() / 2)
             };
-            
-            step.ui = JSON.stringify(position);
             
             // create the step
             $item.newItem($g.wfpath + '/steps', step, uiStep);

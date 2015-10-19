@@ -6,6 +6,7 @@
 define(['jquery', 'jsplumb'], function($, jsPlumb) {
 	
 	return {
+		attrModal:      $('#wf-import-attributes'),
 	    codefield:      document.getElementById('wf-tab-code'),
 	    confirmModal:   $('#wf-confirm-modal'),
 	    loadingModal:   $('#wf-loading-modal'),
@@ -49,6 +50,7 @@ define(['jquery', 'jsplumb'], function($, jsPlumb) {
 	    wf:              null,
 	    codemirror:      null,
 	    panzoom:         null,
+	    attrs:           {},
 		steps:           {},
 		attributes:      [],
 		inputs:          [],

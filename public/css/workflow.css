@@ -323,6 +323,17 @@ div.startItem, div.endItem p {
     /* font-weight: bold; */
 }
 
+
+.attr-form {
+	width: 100%;
+}
+
+.transparent-form {
+	outline: none;
+	border: none;
+	background: transparent;
+}
+
 .ctxicon {
 	min-height: 18px;
 	list-style-type: none;

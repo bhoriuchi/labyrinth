@@ -41,7 +41,7 @@ labyrinth.setup.install().then(function() {
 	// push a handlebars route for the main ui
 	routes.push(dream.hbsRoute({
 		path: '/wf',
-		template: '../public/templates/index.hbs',
+		template: '../public/templates/wf.hbs',
 		context: {
 			'public': '/public'
 		},
