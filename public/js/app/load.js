@@ -47,7 +47,7 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 	/**
 	 * load menu items
 	 */
-	var loadMenuItems = function() {
+	var loadMenuItems = function(id) {
 		
 		// condition
 		$('#generalObjects').append(_menuNode({
@@ -112,11 +112,16 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 	            
 	            for (var i = 0; i < $g.workflows.length; i++) {
 	                var w = $g.workflows[i];
-	            	$('#workflowObjects').append(_menuNode({
-	            		label: w.name,
-	            		type: 'workflow',
-	            		workflowId: w.id
-	            	}));
+	                
+	                // do not allow nesting of workflow in itself due to possible
+	                // infinite recursion
+	                if (w.id !== id) {
+		            	$('#workflowObjects').append(_menuNode({
+		            		label: w.name,
+		            		type: 'workflow',
+		            		workflowId: w.id
+		            	}));
+	                }
 	            }
 	            
 	            // make the menu items draggable

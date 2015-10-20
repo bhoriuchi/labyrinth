@@ -4,93 +4,7 @@
  * 
  */
 define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $canvas) {
-	
-	var importAttributes = function() {
-		
-		var ops = [];
-		
-		$('#wf_import_attributes tr').each(function(idx, row) {
-			var step = $(row).attr('wfStepId');
-			var id   = $(row).attr('wfImportId');
-			var name = $('#import_og_' + id).val();
-			var act  = $('#import_act_' + id).val();
-			var val  = $('#import_val_' + id).val();
-			var obj  = $g.attrs[id];
 
-			console.log('attrs', $g.attrs);
-			
-			if (act === 'import') {
-				ops.push({
-					scope: 'workflow',
-					replicaOf: obj.id,
-					name: val,
-					type: obj.type,
-					defaultValue: obj.defaultValue,
-					description: obj.description,
-					dataType: obj.dataType,
-					workflow: $g.wf.id
-				});
-			}
-			else if (act === 'merge') {
-				$.each($g.steps[step].parameters, function(idx, param) {
-					
-					console.log(param.mapAttribute, '===', val);
-					
-					if (param.mapAttribute === val) {
-						ops.push({
-							id: param.id,
-							mapAttribute: val
-						});
-					}
-				});
-			}
-			
-			$g.loadingModal.dialog('open');
-			
-			console.log('OPS', ops);
-			
-	        $.ajax({
-	            url : $g.wfpath + '/parameters',
-	            method : 'POST',
-	            crossDomain : true,
-	            headers : {
-	                'Accept' : 'application/json'
-	            },
-	            dataType: 'json',
-	            contentType: 'application/json',
-	            data: JSON.stringify(ops)
-	        })
-			.done(function(data, status, xhr) {
-				
-				console.log('step save', data, status, xhr);
-				if (Array.isArray(data)) {
-					$.each(data, function(idx, attr) {
-						var found = false;
-						for (var i = 0; i < $g.attributes.length; i++) {
-							if ($g.attributes[i].id === attr.id) {
-								found = true;
-								$g.attributes[i] = attr;
-								break;
-							}
-						}
-						if (!found) {
-							$g.attributes.push(attr);
-						}
-					});
-				}
-
-				
-				$g.attrModal.dialog('close');
-			})
-			.fail(function(xhr, status, err) {
-				console.log(xhr);
-				$util.errorDialog('Error', xhr.responseJSON.message + '<br><br>' + xhr.responseJSON.details);
-			})
-		    .always(function() {
-		    	$g.loadingModal.dialog('close');
-		    });
-		});
-	};
 	
 	
 	/**
@@ -123,7 +37,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 			scope = 'step';
 		}
 		
-		console.log('messageBody', msg);
+		//console.log('messageBody', msg);
 		
 		if (msg) {
 	        $.ajax({
@@ -141,97 +55,22 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	        	step.attr('wfItemId', data.id);
 	        	$g.steps[id] = data;
 	        	
-	        	
-	        	if (scope === 'workflow') {
-		        	// get the attributes
-		        	$.each(data.subWorkflow.parameters, function(idx, param) {
-		        		if (param.type === 'attribute') {
-		        			param.dataType = param.dataType.id;
-		        			attrs.push(param);
-		        		}
-		        	});
-	        	}
-	
-	        	
-	        	if (attrs.length > 0) {
+	        	$.each(data.parameters, function(param_idx, param) {
+	        		param.dataTypeId = param.dataType.id;
 	        		
-	        		// initialize the global attrs object
-	        		$g.attrs = {};
-	        		
-	        		
-	        		var html = 	'<table class="table table-striped">' +
-	        					'<thead>' +
-	        					'  <tr>' +
-	        					'    <th class="col-xs-4">Attribute</th>' +
-	        					'    <th class="col-xs-4">Action</th>' +
-	        					'    <th class="col-xs-4">As</th>' +
-	        					'  </tr>' +
-	        					'</thead>' +
-	        					'<tbody id="wf_import_attributes">';
-	        		
-	        		$.each(attrs, function(idx, attr) {
-	        			
-	        			$g.attrs[attr.id] = attr;
-	        			
-	        			// prepare the html for merge
-	        			var ddHtml = '<select id="import_val_' + attr.id + '" class="attr-form">';
-	        			var recommendMerge = false;
-	        			
-	        			$.each($g.attributes, function(idx, gattr) {
-	        				
-	        				ddHtml += '<option value="' + gattr.id + '"';
-	        				
-	        				if (gattr.name === attr.name) {
-	        					ddHtml += 'selected';
-	        					recommendMerge = true;
+	        		if (param.type === 'attribute') {
+	        			var found = false;
+	        			$.each($g.attributes, function(attr_idx, attr) {
+	        				if (attr.id === param.id) {
+	        					found = true;
+	        					$g.attributes[attr_idx] = param;
 	        				}
-	        				
-	        				ddHtml += '>' + attr.name + '</option>';
 	        			});
-	        			
-	        			ddHtml += '</option>';
-	        			
-	        			// add a row
-	        			html += '  <tr wfStepId= "' + id + '" wfImportId="' + attr.id + '">' +
-	        					'    <td class="col-xs-4">' +
-	        					'      <input type="text" id="import_og_' + attr.id + '" value="' + attr.name + '" class="attr-form transparent-form" readonly>' +
-	        					'    <td class="col-xs-4">' +
-	        					'      <select id="import_act_' + attr.id + '" class="attr-form" wfImportAttrId="' + attr.id + '">' +
-	        					'        <option value="import">import</option>' +
-	        					'        <option value="merge"';
-	        			
-	        			if (recommendMerge) {
-	        				html += 'selected';
+	        			if (!found) {
+	        				$g.attributes.push(param);
 	        			}
-	        			
-	        			
-	        			html += '>merge</option>' +
-	        					'        <option value="omit">omit</option>' +
-	        					'      </select>' +
-	        					'    </td>' +
-	        					'    <td class="col-xs-4" id="import_as_' + attr.id + '">';
-	        			
-	        			if (recommendMerge) {
-	        				html += ddHtml;
-	        			}
-	        			else {
-	        				html +=	'      <input id="import_val_' + attr.id + '" type="text" value="' + attr.name + '" class="attr-form">';
-	        			}
-	        			
-	        			
-	        			html += '    </td>' +
-	        					'  </tr>';
-	        		});
-	        		
-	        		html += '</tbody>' +
-	        				'</table>';
-	        		
-	        		
-	        		$g.attrModal.html(html);
-	        		$g.attrModal.dialog('open');
-	        		
-	        		console.log('attrs', attrs);
-	        	}
+	        		}
+	        	});
 	        })
 	        .fail(function(xhr, status, err) {
 	        	console.log('failed', xhr, status, err);
@@ -379,7 +218,6 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		// create an item class
 		itemClass = sizeClass + ' item ' + step.type + 'Item';
 
-		console.log(step);
 		// create the html for the step
 		var stepHTML = 	'<div id="' + newId +
 						'" wfItemLabel="' + step.label +
@@ -451,7 +289,6 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	
 	// return functions
 	return {
-		importAttributes: importAttributes,
 		connectItems: connectItems,
 		newItem: newItem,
 		addItem: addItem,

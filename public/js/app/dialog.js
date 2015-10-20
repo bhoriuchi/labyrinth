@@ -3,7 +3,7 @@
  * @license MIT
  * 
  */
-define(['jquery', 'wf-global', 'wf-item', 'jquery-ui'], function($, $g, $item) {
+define(['jquery', 'wf-global', 'wf-item', 'wf-save', 'jquery-ui'], function($, $g, $item, $save) {
 	
 	$g.loadingModal.css('position', 'relative').dialog({
 		autoOpen: false,
@@ -39,14 +39,14 @@ define(['jquery', 'wf-global', 'wf-item', 'jquery-ui'], function($, $g, $item) {
 		    {
 		    	text: 'OK',
 		    	click: function() {
+		    		$save.step();
 		    		$g.editModal.dialog( "close" );
 				}
 		    },
 		    {
 		    	text: 'Apply',
 		    	click: function() {
-		    		console.log($g.codemirror.getValue());
-		    		$g.editModal.dialog( "close" );
+		    		$save.step();
 				}
 		    },
 		    {
@@ -62,35 +62,6 @@ define(['jquery', 'wf-global', 'wf-item', 'jquery-ui'], function($, $g, $item) {
 		}
 	});
 	
-	
-	// import attributes from a sub workflow
-	$g.attrModal.dialog({
-		autoOpen: false,
-		height: $g.editheight,
-		width: $g.editwidth,
-		modal: true,
-		draggable: true,
-		position: {
-			my: 'center top',
-			at: 'center top' + $g.modaltop,
-			of: $(document)
-		},
-		buttons: [
-		    {
-		    	text: 'OK',
-		    	click: function() {
-		    		$g.attrModal.dialog( "close" );
-		    		$item.importAttributes();
-				}
-		    },
-		    {
-		    	text: 'Cancel',
-		    	click: function() {
-		    		$g.attrModal.dialog( "close" );
-				}
-		    },
-		]
-	});
 	
 	
 	// create the edit dialog

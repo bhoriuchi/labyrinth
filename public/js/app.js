@@ -21,6 +21,7 @@ requirejs.config({
 		'wf-item'       : 'app/item',
 		'wf-load'       : 'app/load',
 		'wf-on'         : 'app/on',
+		'wf-save'       : 'app/save',
 		'wf-ui'         : 'app/ui',
 		'wf-util'       : 'app/util'
 	},

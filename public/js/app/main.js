@@ -57,7 +57,7 @@ define(
 		// if there was an id, try to init the canvas
 		if (id) {
 		    $load.loadWorkflow(id, editing, version);
-		    $load.loadMenuItems();
+		    $load.loadMenuItems(id);
 		    $load.loadDataTypes();
 
 		}

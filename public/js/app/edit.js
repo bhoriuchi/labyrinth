@@ -182,6 +182,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				
 				
 				// set the form values
+	        	$('#wf-step-id').val(id);
 				$('#wf-step-name').val(step.label);
 				$('#wf-step-timeout').val(step.timeout);
 				$('#wf-step-usecurrent').prop('checked', step.use_current);
@@ -210,6 +211,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    autoload: true,
 				    data: $g.steps[id]._input,
 				    onItemInserted: function(insert) {
+				    	insert.item.type = 'input';
 				    	$("#wf-input-list").jsGrid('editItem', insert.item);
 				    },
 				    fields: $util.ioParameters()
@@ -222,12 +224,13 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    autoload: true,
 				    data: $g.steps[id]._output,
 				    onItemInserted: function(insert) {
+				    	insert.item.type = 'output';
 				    	$("#wf-output-list").jsGrid('editItem', insert.item);
 				    },
 				    fields: $util.ioParameters()
 				});
 				
-				if (step.type !== 'workflow') {					
+				if (step.type !== 'workflow') {
 					$('#wf-tab-source-tab').show();
 					$g.codemirror.refresh();
 				}

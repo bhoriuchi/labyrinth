@@ -26,6 +26,21 @@ define(['jquery', 'wf-global'], function($, $g) {
 		return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(document.location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 	};
 
+	
+	var select = function(arr, fn) {
+		
+		if (!Array.isArray(arr) || typeof(fn) !== 'function') {
+			return null;
+		}
+		
+		for(var i = 0; i < arr.length; i++) {
+			if (fn(arr[i], i) === true) {
+				return arr[i];
+			}
+		}
+		return null;
+	};
+	
 
 	/**
 	 * function to check if a path exists in an object and return the value
@@ -78,6 +93,17 @@ define(['jquery', 'wf-global'], function($, $g) {
 	
 	
 	var ioParameters = function() {
+		
+		var items = $.pluck($g.dataTypes, ['id', 'name']);
+		var si = 0;
+		
+		// set string as the default data type
+		$.each(items, function(idx, item) {
+			if (item.name === 'string') {
+				si = idx;
+			}
+		});
+		
 		return [
 		    {
 		    	name: 'name',
@@ -90,7 +116,8 @@ define(['jquery', 'wf-global'], function($, $g) {
 		    	type: 'select',
 		    	valueField: 'id',
 		    	textField: 'name',
-		    	items: $.pluck($g.dataTypes, ['id', 'name'])
+		    	items: items,
+		    	selectedIndex: si
 		    },
 		    {
 		    	name: 'mapAttribute',
@@ -104,6 +131,16 @@ define(['jquery', 'wf-global'], function($, $g) {
 		    	name: 'description',
 		    	title: 'Description',
 		    	type: 'text'
+		    },
+		    {
+		    	name: 'required',
+		    	title: 'Required',
+		    	type: 'checkbox'
+		    },
+		    {
+		    	name: 'use_current',
+		    	title: 'Current',
+		    	type: 'checkbox'
 		    },
 		    {
 		    	type: 'control'
@@ -145,6 +182,7 @@ define(['jquery', 'wf-global'], function($, $g) {
 	
 	// return functions
 	return {
+		select: select,
 		confirmDialog: confirmDialog,
 		okDialog: okDialog,
 		errorDialog: errorDialog,
