@@ -196,7 +196,8 @@ function($, $g, $util) {
 		});
 		
 		var msg = {
-			steps: steps
+			steps: steps,
+			ui: JSON.stringify($g.workarea.position())
 		};
 		
 		$g.loadingModal.dialog('open');
