@@ -34,6 +34,7 @@ define(['jquery', 'jsplumb'], function($, jsPlumb) {
 	    toolbarVersion: $('#wf-toolbar-version'),
 	    toolbarSave:    $('#wf-toolbar-save'),
 	    toolbarNew:     $('#wf-toolbar-new'),
+	    toolbarRun:     $('#wf-toolbar-run'),
 	    verModal:       $('#wf-version-workflow'),
 	    viewport:       $('#wf-viewport'),
 	    workarea:       $('#wf-workarea'),

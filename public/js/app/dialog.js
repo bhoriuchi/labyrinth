@@ -108,13 +108,14 @@ define(['jquery', 'wf-global', 'wf-item', 'wf-save', 'jquery-ui'], function($, $
 		    {
 		    	text: 'OK',
 		    	click: function() {
+		    		$save.workflowProperties();
 					$( this ).dialog( "close" );
 				}
 		    },
 		    {
 		    	text: 'Apply',
 		    	click: function() {
-					$( this ).dialog( "close" );
+					$save.workflowProperties();
 				}
 		    },
 		    {

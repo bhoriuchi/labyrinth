@@ -10,10 +10,11 @@ define(
 	    'wf-ui',
 	    'wf-edit',
 	    'wf-item',
+	    'wf-save',
 	    'jquery-ui',
 	    'jquery-panzoom'
 	],
-	function($, $g, $ui, $edit, $item) {
+	function($, $g, $ui, $edit, $item, $save) {
 	
 	
 	// when a node is double clicked
@@ -41,7 +42,11 @@ define(
 	});
 	
 	$g.toolbarSave.on('click', function() {
-		$ui.updateUiPositions();
+		$save.workflowConnections();
+	});
+	
+	$g.toolbarRun.on('click', function() {
+		$edit.newRun();
 	});
 	
 	$g.toolbarReset.on('click', function() {

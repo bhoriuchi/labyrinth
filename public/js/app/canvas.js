@@ -179,6 +179,8 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 	
 	var init = function() {
 		
+		var si = 0;
+		
 		// create the tabs
 		$g.editTabs.tabs({
 	        activate: function(event, ui) {
@@ -226,19 +228,48 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 			}
 		});
 		
+		// set string as the default data type
+		$.each($.pluck($g.dataTypes, ['id', 'name']), function(idx, item) {
+			if (item.name === 'string') {
+				si = idx;
+			}
+		});
+		
 		$("#wf-attributes-list").jsGrid({
 		    width: "100%",
 		    height: "250px",
 		    editing: true,
+		    rowClick: function() {return false;},
 		    autoload: true,
-		    data: $g.attributes,
+		    controller: {
+		    	loadData: function() {
+		    		return $g.attributes;
+		    	},
+		    	insertItem: function(item) {
+		    		item.type = 'attribute';
+		    		return item;
+		    	},
+		    	updateItem: function(item) {
+		    		return item;
+		    	},
+		    	deleteItem: function(item) {
+		    		return item;
+		    	}
+		    },
 		    onItemUpdated: function(update) {
-		    	$("#wf-input-list").jsGrid('option', 'fields', $util.ioParameters());
-		    	$("#wf-output-list").jsGrid('option', 'fields', $util.ioParameters());
+		    	
+	    		if (!update.item.name) {
+	    			update.grid.data.splice(update.itemIndex, 1);
+	    			$util.errorDialog('Error', 'A name is required for the attribute');
+	    		}
+	    		else {
+			    	$("#wf-input-list").jsGrid('option', 'fields', $util.ioParameters('input'));
+			    	$("#wf-output-list").jsGrid('option', 'fields', $util.ioParameters());
+	    		}
+	    		$("#wf-attributes-list").jsGrid('render');
 		    },
 		    onItemInserted: function(insert) {
 		    	$("#wf-attributes-list").jsGrid('editItem', insert.item);
-		    	console.log($g.attributes);
 		    },
 		    fields: [
 		        { name: 'name', title: 'Name', type: 'text' },
@@ -248,10 +279,12 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 			    	type: 'select',
 			    	valueField: 'id',
 			    	textField: 'name',
-			    	items: $.pluck($g.dataTypes, ['id', 'name'])
+			    	items: $.pluck($g.dataTypes, ['id', 'name']),
+			    	selectedIndex: si
 			    },
 		        { name: 'defaultValue', title: 'Default', type: 'text' },
 		        { name: 'description', title: 'Description', type: 'text' },
+		        { name: 'use_current', title: 'Current', type: 'checkbox' },
 		        { type: 'control' }
 		    ]
 		});

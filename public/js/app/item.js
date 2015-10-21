@@ -251,7 +251,12 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 
 		// add the endpoints and push the new id to the steps array
 		$canvas.addEndpoints(newId, endpoint);
+		
+		
+		
+		
 		$g.steps[newId] = step;
+		$util.updateParams(newId, step.parameters);
 		$g.elements.push(newId);
 		$canvas.updateMagnets($g.elements, $g.workarea);
 

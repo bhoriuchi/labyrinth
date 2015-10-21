@@ -5,7 +5,12 @@
  */
 define(['jquery', 'wf-global'], function($, $g) {
 	
-	$.pluck = function(arr, key) {
+	$.pluck = function(arr, key, fn) {
+		
+		if (typeof(fn) !== 'function') {
+			fn = function() {return true;};
+		}
+		
 	    return $.map(arr, function(e) {
 	    	if (Array.isArray(key)) {
 	    		var item = {};
@@ -14,9 +19,12 @@ define(['jquery', 'wf-global'], function($, $g) {
 	    				item[key[i]] = e[key[i]];
 	    			}
 	    		}
-	    		return item;
+	    		if (fn(e)) {
+	    			return item;
+	    		}
 	    	}
-	    	else {
+	    	else if (fn(e)) {
+	    		
 	        	return e[key];
 	    	}
 	    });
@@ -39,6 +47,23 @@ define(['jquery', 'wf-global'], function($, $g) {
 			}
 		}
 		return null;
+	};
+	
+	
+	var filter = function(arr, fn) {
+		
+		var out = [];
+		
+		if (!Array.isArray(arr) || typeof(fn) !== 'function') {
+			return null;
+		}
+		
+		for(var i = 0; i < arr.length; i++) {
+			if (fn(arr[i], i) === true) {
+				out.push(arr[i]);
+			}
+		}
+		return out;
 	};
 	
 
@@ -92,10 +117,11 @@ define(['jquery', 'wf-global'], function($, $g) {
 	};
 	
 	
-	var ioParameters = function() {
+	var ioParameters = function(type) {
 		
 		var items = $.pluck($g.dataTypes, ['id', 'name']);
-		var si = 0;
+		var si    = 0;
+
 		
 		// set string as the default data type
 		$.each(items, function(idx, item) {
@@ -104,7 +130,7 @@ define(['jquery', 'wf-global'], function($, $g) {
 			}
 		});
 		
-		return [
+		var cfg = [
 		    {
 		    	name: 'name',
 		    	title: 'Name',
@@ -125,27 +151,35 @@ define(['jquery', 'wf-global'], function($, $g) {
 		    	type: 'select',
 		    	valueField: 'id',
 		    	textField: 'name',
-		    	items: [{id: '', name: 'None'}].concat($.pluck($g.attributes, ['id', 'name']))
+		    	items: [{id: null, name: ''}].concat($.pluck($g.attributes, ['id', 'name']))
 		    },
 		    {
 		    	name: 'description',
 		    	title: 'Description',
 		    	type: 'text'
-		    },
-		    {
+		    }
+		];
+		
+		// if an input, show the required checkbox
+		if (type === 'input') {
+			cfg.push({
 		    	name: 'required',
 		    	title: 'Required',
 		    	type: 'checkbox'
-		    },
-		    {
-		    	name: 'use_current',
-		    	title: 'Current',
-		    	type: 'checkbox'
-		    },
-		    {
-		    	type: 'control'
-		    }
-	    ];
+		    });
+		}
+		
+		// current
+		cfg.push({
+	    	name: 'use_current',
+	    	title: 'Current',
+	    	type: 'checkbox'
+	    });
+		cfg.push({
+	    	type: 'control'
+	    });
+		
+		return cfg;
 	};
 	
 	var errorDialog = function(title, message) {
@@ -180,9 +214,44 @@ define(['jquery', 'wf-global'], function($, $g) {
 	};
 	
 	
+	
+	var updateParams = function(id, parameters) {
+		
+		
+		$g.steps[id]._input  = [];
+		$g.steps[id]._output = [];
+    	
+    	$.each(parameters, function(paramId, param) {
+    		
+    		// create a new field to reference the data type id
+    		if (param.dataType) {
+    			if (param.dataType.id) {
+    				param.dataTypeId = param.dataType.id;
+    			}
+    			else {
+    				param.dataTypeId = param.dataType;
+    			}
+    		}
+    		
+    		
+    		if (param.type === 'input') {
+    			$g.steps[id]._input.push(param);
+    		}
+    		else if (param.type === 'output') {
+    			$g.steps[id]._output.push(param);
+    		}
+    		else {
+    			$g.steps[id]._input.push(param);
+    		}
+    	});
+	};
+	
+	
 	// return functions
 	return {
+		updateParams: updateParams,
 		select: select,
+		filter: filter,
 		confirmDialog: confirmDialog,
 		okDialog: okDialog,
 		errorDialog: errorDialog,

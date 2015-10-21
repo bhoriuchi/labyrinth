@@ -53,6 +53,47 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	};
 	
 	
+	var newRun = function() {
+		
+		// first get the current workflow parameters
+		$g.loadingModal.dialog('open');
+		
+        $.ajax({
+            url : $g.wfpath + '/workflows/' + $g.wf.id + '?version=0&fields=parameters',
+            method : 'GET',
+            crossDomain : true,
+            headers : {
+                'Accept' : 'application/json'
+            },
+            dataType: 'json',
+            contentType: 'application/json'
+        })
+        .done(function(wf, status, xhr) {
+        	
+        	var inputs = [];
+        	
+        	if (Array.isArray(wf.parameters)) {
+        		$.each(wf.parameters, function(idx, param) {
+        			if (param.type === 'input' && !param.mapAttribute) {
+        				inputs.push(param);
+        			}
+        		});
+        	}
+        	
+        	//console.log(wf);
+        	console.log(inputs);
+        })
+        .fail(function(xhr, status, err) {
+        	$util.errorDialog('Failed', 'Failed to get workflow ' + $g.wf.name);
+        	console.log('failed', xhr, status, err);
+        })
+        .always(function() {
+        	$g.loadingModal.dialog('close');
+        });
+		
+	};
+	
+	
 	var newWorkflow = function() {
 		
 		// add the form
@@ -135,10 +176,8 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		// get the step
 		var step = $g.steps[id];
 		
-		var activity = step.activity ? step.activity : step;
-
 		// open the dialog
-		if (!activity.readonly) {
+		if (!step.activity || !step.activity.readonly) {
 			
 			$g.loadingModal.dialog('open');
 			
@@ -155,31 +194,15 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	        .done(function(step, status, xhr) {
 	        	
 	        	$g.steps[id] = step;
-	        	activity = step.activity || step.subWorkflow || step;
-	        	
-				if (activity && activity.source) {
-					$g.codemirror.setValue(activity.source);
+
+				if (step.source) {
+					$g.codemirror.setValue(step.source);
 				}
 				else {
 					$g.codemirror.setValue('');
 				}
 				
-				$g.steps[id]._input  = [];
-				$g.steps[id]._output = [];
-	        	
-	        	$.each(step.parameters, function(paramId, param) {
-	        		
-	        		// create a new field to reference the data type id
-	        		param.dataTypeId = param.dataType.id;
-	        		
-	        		if (param.type === 'input') {
-	        			$g.steps[id]._input.push(param);
-	        		}
-	        		else if (param.type === 'output') {
-	        			$g.steps[id]._output.push(param);
-	        		}
-	        	});
-				
+				$util.updateParams(id, step.parameters);
 				
 				// set the form values
 	        	$('#wf-step-id').val(id);
@@ -208,24 +231,81 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    width: "100%",
 				    height: "395px",
 				    editing: true,
+				    rowClick: function() {return false;},
 				    autoload: true,
-				    data: $g.steps[id]._input,
+				    controller: {
+				    	loadData: function() {
+				    		return $g.steps[id]._input;
+				    	},
+				    	insertItem: function(item) {
+				    		item.type = 'input';
+				    		return item;
+				    	},
+				    	updateItem: function(item) {
+				    		return item;
+				    	},
+				    	deleteItem: function(item) {
+				    		return item;
+				    	}
+				    },
 				    onItemInserted: function(insert) {
-				    	insert.item.type = 'input';
 				    	$("#wf-input-list").jsGrid('editItem', insert.item);
 				    },
-				    fields: $util.ioParameters()
+				    onItemUpdating: function(args) {
+				    	var attr = $util.select($g.attributes, function(attr) { return attr.id === args.item.mapAttribute;});
+
+				    	if (attr && args.item.dataTypeId !== attr.dataTypeId) {
+				    		args.cancel = true;
+				    		$util.errorDialog('Error', 'The attribute and input parameter do not have the same data type and cannot be mapped');
+				    	}
+				    },
+				    onItemUpdated: function(update) {
+			    		if (!update.item.name) {
+			    			update.grid.data.splice(update.itemIndex, 1);
+			    			$util.errorDialog('Error', 'A name is required for the input parameter');
+			    		}
+		    			$("#wf-input-list").jsGrid('render');
+				    },
+				    fields: $util.ioParameters('input')
 				});
 				
 				$("#wf-output-list").jsGrid({
 				    width: "100%",
 				    height: "395px",
 				    editing: true,
+				    rowClick: function() {return false;},
 				    autoload: true,
-				    data: $g.steps[id]._output,
+				    controller: {
+				    	loadData: function() {
+				    		return $g.steps[id]._output;
+				    	},
+				    	insertItem: function(item) {
+				    		item.type = 'output';
+				    		return item;
+				    	},
+				    	updateItem: function(item) {
+				    		return item;
+				    	},
+				    	deleteItem: function(item) {
+				    		return item;
+				    	}
+				    },
 				    onItemInserted: function(insert) {
-				    	insert.item.type = 'output';
 				    	$("#wf-output-list").jsGrid('editItem', insert.item);
+				    },
+				    onItemUpdated: function(update) {
+			    		if (!update.item.name) {
+			    			update.grid.data.splice(update.itemIndex, 1);
+			    			$util.errorDialog('Error', 'A name is required for the output parameter');
+			    		}
+		    			$("#wf-output-list").jsGrid('render');
+				    },
+				    onItemUpdating: function(args) {
+				    	var attr = $util.select($g.attributes, function(attr) { return attr.id === args.item.mapAttribute;});
+				    	if (attr && args.item.dataTypeId !== attr.dataTypeId) {
+				    		args.cancel = true;
+				    		$util.errorDialog('Error', 'The attribute and output parameter do not have the same data type and cannot be mapped');
+				    	}
 				    },
 				    fields: $util.ioParameters()
 				});
@@ -272,6 +352,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	
 	
 	return {
+		newRun: newRun,
 		newWorkflow: newWorkflow,
 		editStep: editStep,
 		publish: publish,
