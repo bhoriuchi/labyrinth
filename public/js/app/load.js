@@ -174,7 +174,7 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 	        console.log(data, xhr, status);
 	        var oset;
 	        try {
-	        	oset = JSON.parse($g.wf.ui);
+	        	oset = JSON.parse($g.wf.ui).position;
 	        }
 	        catch(err) {
 	        	oset = null;

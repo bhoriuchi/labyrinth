@@ -97,14 +97,17 @@ define(
 
         	// add the step to the workspace
             var uiStep   = $item.addItem(step, null, ui.offset, $g.iconSize);
+            
             var position = {
-            	left: ui.offset.left + ($g.workarea.width() / 2),
-            	top: ui.offset.top + ($g.workarea.height() / 2)
+            	position: {
+                	left: ui.offset.left + ($g.workarea.width() / 2),
+                	top: ui.offset.top + ($g.workarea.height() / 2)
+            	}
             };
             
             // add the position
             step.ui = JSON.stringify(position);
-            
+
             // create the step
             $item.newItem($g.wfpath + '/steps', step, uiStep);
         }

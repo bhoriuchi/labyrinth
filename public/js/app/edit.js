@@ -53,6 +53,35 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	};
 	
 	
+	var execWorkflow = function(body) {
+		
+		body = body || {};
+		
+		$g.loadingModal.dialog('open');
+		
+	    $.ajax({
+	        url : $g.wfpath + '/workflows/' + $g.wf.id + '/runs?version=0',
+	        method : 'POST',
+	        crossDomain : true,
+	        headers : {
+	            'Accept' : 'application/json'
+	        },
+	        dataType: 'json',
+	        contentType: 'application/json',
+	        data: JSON.stringify(body)
+	    })
+	    .done(function(run, status, xhr) {
+	    	console.log(run, status, xhr);
+	    })
+        .fail(function(xhr, status, err) {
+        	$util.errorDialog('Failed', 'Failed to run the workflow');
+        	console.log('failed', xhr, status, err);
+        })
+        .always(function() {
+        	$g.loadingModal.dialog('close');
+        });
+	};
+	
 	var newRun = function() {
 		
 		// first get the current workflow parameters
@@ -80,8 +109,65 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
         		});
         	}
         	
-        	//console.log(wf);
-        	console.log(inputs);
+        	// if there are inputs that can be entered, prompt the user
+        	if (inputs.length > 0) {
+        		
+        		
+        		
+        		// add the form
+        		var html = '<form class="form-horizontal"><div class="form-group" id="wf-run-input-prompt">';
+        		
+        		$.each(inputs, function(idx, input) {
+        			
+        			var reqStar = input.required ? '*' : '';
+        			
+        			html += '' +
+        				'    <label for="wf-input-' + input.id + '" data-toggle="tooltip" title="' + input.description + '" class="control-label col-xs-3">' + input.name + reqStar + ':</label>' +
+        				'    <div class="col-xs-9">' +
+        				'        <input wfInputRequired="' + input.required + '" wfInputName="' + input.name + '" id="wf-input-' + input.id + '" type="text" name="wf-input-' + input.id + '" value="" class="form-control">' +
+        				'    </div>';
+        		});
+
+        		html += '</div></form>';
+
+        		$('#wf-prompt-modal-detail').html(html);
+        		// bind the click operation
+        		$('#wf-prompt-ok-button').off();
+        		$('#wf-prompt-ok-button').on('click', function() {
+        			
+        			var body = {};
+        			var missingRequired = false;
+        			
+        			$('#wf-run-input-prompt').find('input').each(function(idx, form) {
+        				
+        				var val = $(form).val() || null;
+        				var required = Boolean($(form).attr('wfInputRequired'));
+        				
+        				if (required && !val) {
+        					missingRequired = true;
+        					$(form).css('background', '#d9534f');
+        					$(form).css('color', '#ffffff');
+        				}
+        				else {
+        					$(form).css('background', '');
+        					$(form).css('color', '');
+        					body[$(form).attr('wfInputName')] = val;
+        				}
+        			});
+        			
+        			if (!missingRequired) {
+        				$g.promptModal.dialog('close');
+        				execWorkflow(body);
+        			}
+        		});
+        		
+        		
+        		$g.promptModal.dialog('option', 'title', 'Parameters');
+        		$g.promptModal.dialog('open');
+        	}
+        	else {
+        		execWorkflow();
+        	}
         })
         .fail(function(xhr, status, err) {
         	$util.errorDialog('Failed', 'Failed to get workflow ' + $g.wf.name);
@@ -107,7 +193,8 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
                 '    <div class="col-xs-9">' +
                 '        <input id="wf-new-description" type="text" name="wf-new-description" value="" class="form-control">' +
                 '    </div>' +
-            	'</div>');
+            	'</div>' +
+            	'</form>');
 		
 		// bind the click operation
 		$('#wf-prompt-ok-button').off();
@@ -172,6 +259,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	var editStep = function(id, editing) {
 		
 		var draft = (editing === false) ? '' : '?version=0';
+		var locked = false;
 		
 		// get the step
 		var step = $g.steps[id];
@@ -192,16 +280,34 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	            contentType: 'application/json'
 	        })
 	        .done(function(step, status, xhr) {
-	        	
 	        	$g.steps[id] = step;
 
-				if (step.source) {
-					$g.codemirror.setValue(step.source);
+				if (step.activity) {
+					$g.codemirror.setValue(step.activity.source);
+					$g.codemirror.setOption('readOnly', 'nocursor');
+					$g.codemirror.setOption('theme', 'eclipse-ro');
+					$('#wf-input-new-btn').css('visibility', 'hidden');
+					$('#wf-output-new-btn').css('visibility', 'hidden');
+					locked = true;
+				}
+				else if (step.subWorkflow) {
+					$g.codemirror.setValue('');
+					$g.codemirror.setOption('readOnly', 'nocursor');
+					$g.codemirror.setOption('theme', 'eclipse-ro');
+					$('#wf-input-new-btn').css('visibility', 'hidden');
+					$('#wf-output-new-btn').css('visibility', 'hidden');
+					locked = true;
 				}
 				else {
-					$g.codemirror.setValue('');
+					$g.codemirror.setValue(step.source || '');
+					$g.codemirror.setOption('readOnly', false);
+					$g.codemirror.setOption('theme', 'eclipse');
+					$('#wf-input-new-btn').css('visibility', '');
+					$('#wf-output-new-btn').css('visibility', '');
+					locked = false;
 				}
 				
+				$g.codemirror.refresh();
 				$util.updateParams(id, step.parameters);
 				
 				// set the form values
@@ -233,6 +339,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    editing: true,
 				    rowClick: function() {return false;},
 				    autoload: true,
+				    confirmDeleting: false,
 				    controller: {
 				    	loadData: function() {
 				    		return $g.steps[id]._input;
@@ -248,8 +355,14 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    		return item;
 				    	}
 				    },
-				    onItemInserted: function(insert) {
-				    	$("#wf-input-list").jsGrid('editItem', insert.item);
+				    onItemDeleting: function(args) {
+				    	if ($g.steps[id].activity || $g.steps[id].subWorkflow) {
+				    		args.cancel = true;
+				    		$util.errorDialog('Error', 'Inputs cannot be deleted on inherited activities');
+				    	}
+				    },
+				    onItemInserted: function(args) {
+				    	$("#wf-input-list").jsGrid('editItem', args.item);
 				    },
 				    onItemUpdating: function(args) {
 				    	var attr = $util.select($g.attributes, function(attr) { return attr.id === args.item.mapAttribute;});
@@ -259,14 +372,14 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    		$util.errorDialog('Error', 'The attribute and input parameter do not have the same data type and cannot be mapped');
 				    	}
 				    },
-				    onItemUpdated: function(update) {
-			    		if (!update.item.name) {
-			    			update.grid.data.splice(update.itemIndex, 1);
+				    onItemUpdated: function(args) {
+			    		if (!args.item.name) {
+			    			args.grid.data.splice(args.itemIndex, 1);
 			    			$util.errorDialog('Error', 'A name is required for the input parameter');
 			    		}
 		    			$("#wf-input-list").jsGrid('render');
 				    },
-				    fields: $util.ioParameters('input')
+				    fields: $util.ioParameters('input', locked)
 				});
 				
 				$("#wf-output-list").jsGrid({
@@ -275,6 +388,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    editing: true,
 				    rowClick: function() {return false;},
 				    autoload: true,
+				    confirmDeleting: false,
 				    controller: {
 				    	loadData: function() {
 				    		return $g.steps[id]._output;
@@ -307,7 +421,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    		$util.errorDialog('Error', 'The attribute and output parameter do not have the same data type and cannot be mapped');
 				    	}
 				    },
-				    fields: $util.ioParameters()
+				    fields: $util.ioParameters('output', locked)
 				});
 				
 				if (step.type !== 'workflow') {

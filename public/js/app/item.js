@@ -251,12 +251,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 
 		// add the endpoints and push the new id to the steps array
 		$canvas.addEndpoints(newId, endpoint);
-		
-		
-		
-		
 		$g.steps[newId] = step;
-		$util.updateParams(newId, step.parameters);
 		$g.elements.push(newId);
 		$canvas.updateMagnets($g.elements, $g.workarea);
 
@@ -276,7 +271,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		$.each(data.steps, function(index, step) {
 			var pos;
 			try {
-				pos = JSON.parse(step.ui);
+				pos = JSON.parse(step.ui).position;
 				
 				pos = {
 					top: pos.top - ($g.workarea.height() / 2),
@@ -284,6 +279,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				};
 			}
 			catch (err) {
+				console.log(err);
 				pos = null;
 			}
 			//pos = null;

@@ -72,9 +72,17 @@ function($, $g, $util) {
 			failsWorkflow: $('#wf-step-failworkflow').prop('checked'),
 			waitOnSuccess: $('#wf-step-wait').prop('checked'),
 			requireKey: $('#wf-step-requirekey').prop('checked'),
-			source: $g.codemirror.getValue(),
 			parameters: parameters
 		};
+		
+		// add the source if applicable
+		if (!s.activity && !s.subWorkflow) {
+			msg.source = $g.codemirror.getValue();
+			
+			// determine modules to load
+			
+			
+		}
 
 		$g.loadingModal.dialog('open');
 		
@@ -182,8 +190,10 @@ function($, $g, $util) {
 			var step = $g.steps[$(item).attr('id')];
 			
 			var position = {
-				left: $(item).offset().left + ($g.workarea.width() / 2),
-				top: $(item).offset().top + ($g.workarea.height() / 2)
+				position: {
+					left: $(item).offset().left + ($g.workarea.width() / 2),
+					top: $(item).offset().top + ($g.workarea.height() / 2)
+				}
 			};
 			
 			steps.push({
@@ -197,7 +207,7 @@ function($, $g, $util) {
 		
 		var msg = {
 			steps: steps,
-			ui: JSON.stringify($g.workarea.position())
+			ui: JSON.stringify({position: $g.workarea.position()})
 		};
 		
 		$g.loadingModal.dialog('open');

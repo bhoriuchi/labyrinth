@@ -117,7 +117,7 @@ define(['jquery', 'wf-global'], function($, $g) {
 	};
 	
 	
-	var ioParameters = function(type) {
+	var ioParameters = function(type, locked) {
 		
 		var items = $.pluck($g.dataTypes, ['id', 'name']);
 		var si    = 0;
@@ -175,9 +175,19 @@ define(['jquery', 'wf-global'], function($, $g) {
 	    	title: 'Current',
 	    	type: 'checkbox'
 	    });
-		cfg.push({
-	    	type: 'control'
-	    });
+		
+		if (locked) {
+			cfg.push({
+		    	type: 'control',
+		    	deleteButton: false
+		    });
+		}
+		else {
+			cfg.push({
+		    	type: 'control'
+		    });
+		}
+
 		
 		return cfg;
 	};
