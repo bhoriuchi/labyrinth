@@ -29,7 +29,7 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 		
         // get the workflows
         $.ajax({
-            url : $g.wfpath + '/datatypes',
+            url : $g.wfpath + '/datatypes?view=load',
             method : 'GET',
             crossDomain : true,
             headers : {
@@ -69,7 +69,7 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 
 	    // get the activities
 	    $.ajax({
-	        url : $g.wfpath + '/activitys?maxdepth=0',
+	        url : $g.wfpath + '/activitys?view=menu',
 	        method : 'GET',
 	        crossDomain : true,
 	        headers : {
@@ -100,7 +100,7 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 	        
 	        // get the workflows
 	        $.ajax({
-	            url : $g.wfpath + '/workflows?maxdepth=0',
+	            url : $g.wfpath + '/workflows?view=menu',
 	            method : 'GET',
 	            crossDomain : true,
 	            headers : {
@@ -108,6 +108,9 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 	            }
 	        })
 	        .done(function(data, status, xhr) {
+	        	
+	        	console.log(data);
+	        	
 	            $g.workflows = data;
 	            
 	            for (var i = 0; i < $g.workflows.length; i++) {
@@ -153,7 +156,7 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 		
 	    // get the workflow
 	    $.ajax({
-	        url : $g.wfpath + '/workflows/' + id + version,
+	        url : $g.wfpath + '/workflows/' + id + version + '&view=load',
 	        method : 'GET',
 	        crossDomain : true,
 	        headers : {

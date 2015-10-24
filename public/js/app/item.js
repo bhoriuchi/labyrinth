@@ -41,7 +41,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		
 		if (msg) {
 	        $.ajax({
-	            url : path + '?maxdepth=1',
+	            url : path + '?view=load',
 	            method : 'POST',
 	            crossDomain : true,
 	            headers : {
@@ -269,19 +269,23 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		
 		// create the step divs and get the start/end ids
 		$.each(data.steps, function(index, step) {
-			var pos;
-			try {
-				pos = JSON.parse(step.ui).position;
-				
-				pos = {
-					top: pos.top - ($g.workarea.height() / 2),
-					left: pos.left - ($g.workarea.width() / 2)
-				};
+			var pos = null;
+			
+			if (step.ui) {
+				try {
+					pos = JSON.parse(step.ui).position;
+					
+					pos = {
+						top: pos.top - ($g.workarea.height() / 2),
+						left: pos.left - ($g.workarea.width() / 2)
+					};
+				}
+				catch (err) {
+					console.log(err);
+					pos = null;
+				}
 			}
-			catch (err) {
-				console.log(err);
-				pos = null;
-			}
+
 			//pos = null;
 			prevElement = addItem(step, prevElement, pos, size);
 			data.steps[index].htmlId = prevElement.attr('id');

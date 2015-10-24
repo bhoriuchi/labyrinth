@@ -8,7 +8,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	
 	var publish = function(force) {
 
-		var forceQs = (force === true) ? '?force=true' : '';
+		var forceQs = (force === true) ? '&force=true' : '';
 		$g.verModal.dialog('close');
 		$g.loadingModal.dialog('open');
 		
@@ -23,6 +23,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	        contentType: 'application/json'
 	    })
 	    .done(function(data, status, xhr) {
+	    	console.log(data);
 	    	$g.confirmModal.dialog('close');
 	    	$util.okDialog('Successfully Published!', 'Successfully published version ' + data[0].current_version);
 	    })
@@ -221,7 +222,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 			};
 
 	        $.ajax({
-	            url : $g.wfpath + '/workflows',
+	            url : $g.wfpath + '/workflows?view=load',
 	            method : 'POST',
 	            crossDomain : true,
 	            headers : {
@@ -270,7 +271,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 			$g.loadingModal.dialog('open');
 			
 	        $.ajax({
-	            url : $g.wfpath + '/steps/' + step.id + draft,
+	            url : $g.wfpath + '/steps/' + step.id + draft + '&view=edit',
 	            method : 'GET',
 	            crossDomain : true,
 	            headers : {
