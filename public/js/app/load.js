@@ -109,7 +109,7 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 	        })
 	        .done(function(data, status, xhr) {
 	        	
-	        	console.log(data);
+	        	//console.log(data);
 	        	
 	            $g.workflows = data;
 	            
@@ -174,7 +174,7 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
     		// set the title
     		$g.header.html(header);
 	    	
-	        console.log(data, xhr, status);
+	        //console.log(data, xhr, status);
 	        var oset;
 	        try {
 	        	oset = JSON.parse($g.wf.ui).position;

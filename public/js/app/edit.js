@@ -136,7 +136,9 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
         		$('#wf-prompt-ok-button').off();
         		$('#wf-prompt-ok-button').on('click', function() {
         			
-        			var body = {};
+        			var body = {
+        				input: {}
+        			};
         			var missingRequired = false;
         			
         			$('#wf-run-input-prompt').find('input').each(function(idx, form) {
@@ -152,7 +154,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
         				else {
         					$(form).css('background', '');
         					$(form).css('color', '');
-        					body[$(form).attr('wfInputName')] = val;
+        					body.input[$(form).attr('wfInputName')] = val;
         				}
         			});
         			
