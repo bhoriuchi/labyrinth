@@ -345,10 +345,13 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    confirmDeleting: false,
 				    controller: {
 				    	loadData: function() {
-				    		return $g.steps[id]._input;
+				    		return $util.filter($g.steps[id].parameters, function(val, idx) {
+				    			return val.type === 'input';
+				    		});
 				    	},
 				    	insertItem: function(item) {
 				    		item.type = 'input';
+				    		$g.steps[id].parameters.push(item);
 				    		return item;
 				    	},
 				    	updateItem: function(item) {
@@ -376,6 +379,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    	}
 				    },
 				    onItemUpdated: function(args) {
+				    	console.log(args);
 			    		if (!args.item.name) {
 			    			args.grid.data.splice(args.itemIndex, 1);
 			    			$util.errorDialog('Error', 'A name is required for the input parameter');
@@ -394,10 +398,13 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 				    confirmDeleting: false,
 				    controller: {
 				    	loadData: function() {
-				    		return $g.steps[id]._output;
+				    		return $util.filter($g.steps[id].parameters, function(val, idx) {
+				    			return val.type === 'output';
+				    		});
 				    	},
 				    	insertItem: function(item) {
 				    		item.type = 'output';
+				    		$g.steps[id].parameters.push(item);
 				    		return item;
 				    	},
 				    	updateItem: function(item) {

@@ -282,7 +282,7 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 			    	items: $.pluck($g.dataTypes, ['id', 'name']),
 			    	selectedIndex: si
 			    },
-		        { name: 'defaultValue', title: 'Default', type: 'text' },
+		        { name: 'defaultValue', title: 'Initial Value', type: 'text' },
 		        { name: 'description', title: 'Description', type: 'text' },
 		        { name: 'use_current', title: 'Current', type: 'checkbox' },
 		        { type: 'control' }

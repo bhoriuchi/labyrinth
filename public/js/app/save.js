@@ -23,7 +23,7 @@ function($, $g, $util) {
 				p = {
 					name: param.name,
 					description: param.description,
-					dataType: param.dataTypeId,
+					dataType: param.dataTypeId || param.dataType.id,
 					scope: scope,
 					type: param.type,
 					use_current: param.use_current,
@@ -61,7 +61,7 @@ function($, $g, $util) {
 		var id         = $('#wf-step-id').val();
 		var s          = $g.steps[id];
 		var timeout    = $('#wf-step-timeout').val();
-		var params     = s._input.concat(s._output);
+		var params     = s.parameters;
 		var parameters = prepareParams(params, 'step', s.id);
 		
 		// gather the data
@@ -126,13 +126,17 @@ function($, $g, $util) {
 		
 		// get the rest of the parameters
 		$.each($g.steps, function(idx, step) {
-			if (step._input) {
-				params = params.concat(prepareParams(step._input, 'step', step.id));
-			}
-			if (step._output) {
-				params = params.concat(prepareParams(step._output, 'step', step.id));
-			}
+
+			params = params.concat(prepareParams($util.filter(step.parameters, function(val, idx) {
+				return val.type === 'input';
+			}), 'step', step.id));
+			
+			params = params.concat(prepareParams($util.filter(step.parameters, function(val, idx) {
+				return val.type === 'output';
+			}), 'step', step.id));
 		});
+		
+		console.log($g.attributes);
 		
 		var msg = {
 			name: $('#wf-wf-name').val(),

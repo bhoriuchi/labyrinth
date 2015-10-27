@@ -225,33 +225,18 @@ define(['jquery', 'wf-global'], function($, $g) {
 	
 	
 	
-	var updateParams = function(id, parameters) {
-		
-		
-		$g.steps[id]._input  = [];
-		$g.steps[id]._output = [];
-    	
-    	$.each(parameters, function(paramId, param) {
+	var updateParams = function(id) {
+
+    	$.each($g.steps[id].parameters, function(paramId, param) {
     		
     		// create a new field to reference the data type id
     		if (param.dataType) {
     			if (param.dataType.id) {
-    				param.dataTypeId = param.dataType.id;
+    				$g.steps[id].parameters[paramId].dataTypeId = param.dataType.id;
     			}
     			else {
-    				param.dataTypeId = param.dataType;
+    				$g.steps[id].parameters[paramId].dataTypeId = param.dataType;
     			}
-    		}
-    		
-    		
-    		if (param.type === 'input') {
-    			$g.steps[id]._input.push(param);
-    		}
-    		else if (param.type === 'output') {
-    			$g.steps[id]._output.push(param);
-    		}
-    		else {
-    			$g.steps[id]._input.push(param);
     		}
     	});
 	};
