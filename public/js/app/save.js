@@ -98,7 +98,10 @@ function($, $g, $util) {
 	        data: JSON.stringify(msg)
 	    })
         .done(function(step, status, xhr) {
-        	$g.steps[id] = step;
+        	step.success   = $g.steps[id].success;
+        	step.fail      = $g.steps[id].fail;
+        	step.exception = $g.steps[id].exception;
+        	$g.steps[id]   = step;
         	$util.updateParams(id, step.parameters);
         	
         	// re-render the grids 

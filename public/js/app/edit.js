@@ -283,7 +283,10 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	            contentType: 'application/json'
 	        })
 	        .done(function(step, status, xhr) {
-	        	$g.steps[id] = step;
+	        	step.success   = $g.steps[id].success;
+	        	step.fail      = $g.steps[id].fail;
+	        	step.exception = $g.steps[id].exception;
+	        	$g.steps[id]   = step;
 
 				if (step.activity) {
 					$g.codemirror.setValue(step.activity.source);
