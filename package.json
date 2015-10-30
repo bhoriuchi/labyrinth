@@ -26,7 +26,8 @@
     "sbx": "^1.0.4",
     "debate": "^0.0.1",
     "hat": "^0.0.3",
-    "lodash": "^3.10.1"
+    "lodash": "^3.10.1",
+    "dtrace-provider": "^0.6.0"
   },
   "scripts": {
     "test": "echo \\\"Error: no test specified\\\" && exit 1"
