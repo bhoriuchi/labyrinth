@@ -33,8 +33,7 @@ var labyrinth  = dream.register.plugin('labyrinth', require('../lib/labyrinth'))
 // allow modules
 labyrinth.modules.set(['console', 'lodash']);
 
-//labyrinth.setup.install().then(function() {
-
+var run = function() {
 	// get the routes
 	var routes = dream.getRoutes();
 
@@ -57,6 +56,22 @@ labyrinth.modules.set(['console', 'lodash']);
 	
 	// run the server
 	dream.run(routes);
-//});
+};
+
+
+
+var install = true;
+
+
+if (install === true) {
+	labyrinth.setup.install().then(function() {
+		run();
+	});
+}
+else {
+	run();
+}
+
+
 	
 	

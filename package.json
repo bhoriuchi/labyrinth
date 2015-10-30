@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "dreamcatcher": "git+https://github.com/bhoriuchi/dreamcatcher.git#master",
-    "sbx": "^1.0.4",
+    "sbx": "^1.0.5",
     "debate": "^0.0.1",
     "hat": "^0.0.3",
     "lodash": "^3.10.1",
