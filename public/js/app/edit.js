@@ -7,7 +7,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 
 	var publish = function(force) {
 
-		var forceQs = (force === true) ? '&force=true' : '';
+		var forceQs = (force === true) ? '?force=true' : '';
 		$g.verModal.dialog('close');
 		$g.loadingModal.dialog('open');
 		
@@ -22,14 +22,19 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	        contentType: 'application/json'
 	    })
 	    .done(function(data, status, xhr) {
-	    	console.log(data);
 	    	$g.confirmModal.dialog('close');
 	    	$util.okDialog('Successfully Published!', 'Successfully published version ' + data[0].current_version);
 	    })
 	    .fail(function(xhr, status, err) {
 	    	
 	    	if (xhr.responseJSON && xhr.responseJSON.error === 'ER_COULD_NOT_PUBLISH_RELATION') {
-	    		$util.confirmDialog(' Force Publish?', 'One or more dependents require publishing in order to publish this workflow. Select OK to force dependent publishing or Cancel to quit', publish, [true]);
+	    		console.log(xhr);
+	    		
+	    		var msg = 	'One or more dependents require publishing in order to publish this workflow. ' +
+	    					'Select OK to force dependent publishing or Cancel to quit<br><br>' +
+	    					xhr.responseJSON.details.join(', ');
+	    		
+	    		$util.confirmDialog(' Force Publish?', msg, publish, [true]);
 	    	}
 	    	else {
 	    		$g.confirmModal.dialog('close');
@@ -86,9 +91,9 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 		
 		// first get the current workflow parameters
 		$g.loadingModal.dialog('open');
-		
+
         $.ajax({
-            url : $g.wfpath + '/workflows/' + $g.wf.id + '?version=0&fields=parameters',
+            url : $g.wfpath + '/workflows/' + $g.wf.id + '?version=' + $g.version + '&fields=parameters',
             method : 'GET',
             crossDomain : true,
             headers : {

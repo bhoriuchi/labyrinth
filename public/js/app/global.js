@@ -6,6 +6,7 @@
 define(['jquery', 'jsplumb'], function($, jsPlumb) {
 	
 	return {
+		socket:         null,
 		id:             null,
 		version:        null,
 		attrModal:      $('#wf-import-attributes'),

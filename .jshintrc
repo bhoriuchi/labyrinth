@@ -134,6 +134,7 @@
 		"window": false,
 		"requirejs": false,
 		"define": false,
-		"localStorage": false
+		"localStorage": false,
+		"io": false
 	}
 }

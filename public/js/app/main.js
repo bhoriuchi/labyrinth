@@ -10,6 +10,7 @@ define(
     	'wf-load',
     	'wf-util',
     	'wf-ui',
+    	'socketio',
     	'wf-canvas',
     	'wf-item',
     	'wf-edit',
@@ -19,9 +20,10 @@ define(
     	'jsplumb',
     	'jquery-panzoom',
     	'wf-on',
-    	'wf-dialog'
+    	'wf-dialog',
+
     ],
-    function($, $g, $load, $util, $ui) {
+    function($, $g, $load, $util, $ui, io) {
 	
 		// allow html in dialog headers
 		$.widget('ui.dialog', $.extend({}, $.ui.dialog.prototype, {
@@ -35,6 +37,22 @@ define(
 	 * call the initialization functions
 	 */
 	$(document).ready(function() {
+		
+		// create a socket.io connection
+		$g.socket   = io.connect('http://localhost:8080', {
+			reconnection: false
+		});
+
+		$g.socket.on('connection', function(msg) {
+			
+			console.log('socket.io is', msg);
+		});
+		
+		$g.socket.on('log', function(msg) {
+			
+			console.log('log message sent', msg);
+		});
+		
 		
 		// get the id
 		var id      = $util.getURLParameter('id');

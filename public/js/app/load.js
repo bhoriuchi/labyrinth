@@ -150,16 +150,16 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 		$g.iconSize = iconSize || $g.iconSize;
 		$g.gridSize = !isNaN(gridSize) ? gridSize : $g.gridSize;
 		
+		$g.id      = id;
+		$g.version = (editing === true) ? '0' : version;
+		$g.editing = (editing === true) ? true : false;
 		
 		$g.loadingModal.dialog('open');
 		
 		var verDate = (new Date(version)).toISOString();
 		version = '?version=' + version;
 		version = (editing === false) ? version : '?version=0';
-		
-		$g.id      = id;
-		$g.version = version;
-		$g.editing = (editing === true) ? true : false;
+
 		
 	    // get the workflow
 	    $.ajax({

@@ -5,6 +5,7 @@
  */
 requirejs.config({
 	paths: {
+		'socketio'      : 'vendor/socket.io',
 		'biltong'       : 'vendor/biltong-0.2',
 		'bootstrap'     : 'vendor/bootstrap.min',
 		'farahey'       : 'vendor/farahey-0.5',
@@ -33,6 +34,9 @@ requirejs.config({
 		}
 	],
 	shim: {
+		'socketio': {
+			exports: 'io'
+		},
 		'jquery': {
 			exports: '$'
 		},
