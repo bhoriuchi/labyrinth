@@ -346,11 +346,12 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 		$.contextMenu({
 	        selector: '.connectable',
 	        callback: function(key, options) {
+	        	console.log(options);
 	        	if (key === 'edit') {
 	        		$edit.editStep(options.$trigger.attr('id'));
 	        	}
 	        	else if (key === 'delete') {
-	        		options.$trigger.remove();
+	        		$edit.removeStep(options);
 	        	}
 	        },
 	        items: {

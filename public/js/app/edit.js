@@ -477,8 +477,44 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	};
 	
 	
+	var removeStep = function(options, force) {
+		
+		if (!force) {
+			$util.confirmDialog(' Delete Step', 'Are you sure you want to permanently remove the step?', removeStep, [options, true]);
+		}
+		else {
+			$g.confirmModal.dialog('close');
+			$g.loadingModal.dialog('open');
+			
+			var id = options.$trigger.attr('wfItemId');
+			
+			
+	        $.ajax({
+	            url : $g.wfpath + '/steps/' + id,
+	            method : 'DELETE',
+	            crossDomain : true,
+	            headers : {
+	                'Accept' : 'application/json'
+	            },
+	            dataType: 'json',
+	            contentType: 'application/json'
+	        })
+	        .done(function(res, status, xhr) {
+	        	console.log(res);
+				options.$trigger.remove();
+	        })
+	        .fail(function(xhr, status, err) {
+	        	console.log('failed', xhr, status, err);
+	        })
+	        .always(function() {
+	        	$g.loadingModal.dialog('close');
+	        });
+		}
+	};
+	
 	
 	return {
+		removeStep: removeStep,
 		newRun: newRun,
 		newWorkflow: newWorkflow,
 		editStep: editStep,
