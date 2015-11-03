@@ -166,12 +166,27 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 				_dragElement = p.el.getAttribute("id");
 			},
 			drag : function(p) {
+
+				if ($g.gridSize) {
+					// get the position
+					var el = $(p.el);
+					var pos = el.position();
+					
+					// emulate grid snapping
+					pos.left = ($g.gridSize * Math.floor(pos.left / $g.gridSize));
+					pos.top = ($g.gridSize * Math.floor(pos.top / $g.gridSize));
+					el.css('top', pos.top).css('left', pos.left);
+				}
+				
+				// update the magnets and diagram
 				magnet.executeAtEvent(p.e);
 				$g.diagram.repaintEverything();
 			},
 			stop : function(p) {
 				_dragElement = null;
+
 				$g.diagram.repaintEverything();
+				
 			}
 		});
 	};
@@ -181,7 +196,7 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 		
 		var si = 0;
 		
-		// create the tabs
+		
 		$g.editTabs.tabs({
 	        activate: function(event, ui) {
 	        	
@@ -325,20 +340,23 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 	    // when a connection is removed
 	    $g.diagram.bind('connectionDetached', function(info, event) {
 	    	
-	    	// get the connection type
-	    	var type = info.sourceEndpoint.anchor.type;
-	    	var source = info.source.id;
-	    	var target = info.target.id;
+	    	if (!$g.removingStep) {
 	    	
-	    	// connect the appropriate
-	    	if (type === $g.conn.success) {
-	    		$g.steps[source].success = null;
-	    	}
-	    	else if (type === $g.conn.fail) {
-	    		$g.steps[source].fail = null;
-	    	}
-	    	else if (type === $g.conn.exception) {
-	    		$g.steps[source].exception = null;
+		    	// get the connection type
+		    	var type = info.sourceEndpoint.anchor.type;
+		    	var source = info.source.id;
+		    	var target = info.target.id;
+		    	
+		    	// connect the appropriate
+		    	if (type === $g.conn.success) {
+		    		$g.steps[source].success = null;
+		    	}
+		    	else if (type === $g.conn.fail) {
+		    		$g.steps[source].fail = null;
+		    	}
+		    	else if (type === $g.conn.exception) {
+		    		$g.steps[source].exception = null;
+		    	}
 	    	}
 	    });
 
@@ -346,7 +364,6 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 		$.contextMenu({
 	        selector: '.connectable',
 	        callback: function(key, options) {
-	        	console.log(options);
 	        	if (key === 'edit') {
 	        		$edit.editStep(options.$trigger.attr('id'));
 	        	}
@@ -357,11 +374,21 @@ function($, $g, $util, $edit, jsPlumb, Magnetizer, CodeMirror) {
 	        items: {
 	            'edit': {
 	            	name: 'Edit',
-	            	icon: 'edit'
+	            	icon: 'edit',
+	            	disabled: function(key, options) {
+	            		var id   = options.$trigger.attr('id');
+	            		var type = $g.steps[id].type;
+	            		return type === 'start' || type === 'end';
+	            	}
 	            },
 	            'delete': {
 	            	name: 'Delete',
-	            	icon: 'delete'
+	            	icon: 'delete',
+	            	disabled: function(key, options) {
+	            		var id   = options.$trigger.attr('id');
+	            		var type = $g.steps[id].type;
+	            		return type === 'start' || type === 'end';
+	            	}
 	            }
 	        }
 	    });

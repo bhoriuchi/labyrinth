@@ -6,6 +6,8 @@
 define(['jquery', 'jsplumb'], function($, jsPlumb) {
 	
 	return {
+		id:             null,
+		version:        null,
 		attrModal:      $('#wf-import-attributes'),
 	    codefield:      document.getElementById('wf-tab-code'),
 	    confirmModal:   $('#wf-confirm-modal'),
@@ -18,6 +20,7 @@ define(['jquery', 'jsplumb'], function($, jsPlumb) {
 	    editTabs:       $('#wf-editTabs'),
 	    editModal:      $('#wf-edit-step'),
 	    header:         $('#wf-header'),
+	    gridSize:       20,
 	    iconSize:       'small',
 	    itemSelect:     $("#itemSelect"),
 	    lsMenu:         'labyrinth-wf-accordion-active',
@@ -25,6 +28,7 @@ define(['jquery', 'jsplumb'], function($, jsPlumb) {
 	    menu:           $('#wf-menu'),
 	    menuLoaded:     false,
 	    menuOpen:       false,
+	    removingStep:   false,
 	    menuToggle:     $('#wf-menuToggle'),
 	    okModal:        $('#wf-ok-modal'),
 	    promptModal:    $('#wf-prompt-modal'),

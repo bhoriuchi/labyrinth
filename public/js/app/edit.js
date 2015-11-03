@@ -4,8 +4,7 @@
  * 
  */
 define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $canvas) {
-	
-	
+
 	var publish = function(force) {
 
 		var forceQs = (force === true) ? '&force=true' : '';
@@ -479,6 +478,17 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	
 	var removeStep = function(options, force) {
 		
+		// get the ids
+		var id    = options.$trigger.attr('wfItemId');
+		var domId = options.$trigger.attr('id');
+		var type  = $g.steps[domId].type;
+		
+		// return for removal of start and end step
+		if (type === 'start' || type === 'end') {
+			return false;
+		}
+
+		
 		if (!force) {
 			$util.confirmDialog(' Delete Step', 'Are you sure you want to permanently remove the step?', removeStep, [options, true]);
 		}
@@ -486,9 +496,7 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 			$g.confirmModal.dialog('close');
 			$g.loadingModal.dialog('open');
 			
-			var id = options.$trigger.attr('wfItemId');
-			
-			
+			// delete the step
 	        $.ajax({
 	            url : $g.wfpath + '/steps/' + id,
 	            method : 'DELETE',
@@ -500,8 +508,10 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	            contentType: 'application/json'
 	        })
 	        .done(function(res, status, xhr) {
-	        	console.log(res);
-				options.$trigger.remove();
+	        	// remove the dom element and reload the workflow
+	        	$g.diagram.remove(domId);
+	        	delete $g.steps[domId];	 
+	        	$g.load.loadWorkflow($g.id, $g.editing, $g.version);
 	        })
 	        .fail(function(xhr, status, err) {
 	        	console.log('failed', xhr, status, err);

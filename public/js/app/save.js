@@ -78,10 +78,6 @@ function($, $g, $util) {
 		// add the source if applicable
 		if (!s.activity && !s.subWorkflow) {
 			msg.source = $g.codemirror.getValue();
-			
-			// determine modules to load
-			
-			
 		}
 
 		$g.loadingModal.dialog('open');
@@ -109,7 +105,14 @@ function($, $g, $util) {
         	$("#wf-output-list").jsGrid("render");
         	
         	// update the label
+        	$('#itemlabel-' + id).width(150);
         	$('#itemlabel-' + id).html('<span>' + msg.label + '</span>');
+        	$('#itemlabel-' + id).width($('#itemlabel-' + id + ' > span').outerWidth() + 4);
+        	$('#itemlabel-' + id).position({
+        		my: 'top+5',
+        		at: 'bottom',
+        		of: $('#' + id)
+        	});
         	
         })
         .fail(function(xhr, status, err) {
@@ -138,9 +141,7 @@ function($, $g, $util) {
 				return val.type === 'output';
 			}), 'step', step.id));
 		});
-		
-		console.log($g.attributes);
-		
+
 		var msg = {
 			name: $('#wf-wf-name').val(),
 			description: $('#wf-wf-description').val(),
@@ -176,7 +177,10 @@ function($, $g, $util) {
         	
         	// re-render the grid
         	$("#wf-attribute-list").jsGrid("render");
-        	$('#wf-header').html(msg.name);
+        	
+        	var verDate = (new Date($g.version)).toISOString();
+        	var header = $g.editing ? wf.name + ' - DRAFT' : wf.name + ' - Version ' + wf.current_version + ' (' + verDate + ')';
+        	$('#wf-header').html(header);
         })
         .fail(function(xhr, status, err) {
         	console.log('failed', xhr, status, err);

@@ -56,10 +56,13 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 		}));
 		
 		// loop
+		// TODO add support for loops
+		/*
 		$('#generalObjects').append(_menuNode({
 			label: 'Loop',
 			type: 'loop'
 		}));
+		*/
 		
 		// new task
 		$('#generalObjects').append(_menuNode({
@@ -81,14 +84,7 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 	        
 	        for (var i = 0; i < $g.activities.length; i++) {
 	            var a = $g.activities[i];
-	            if (a.type === 'end') {
-	            	$('#generalObjects').append(_menuNode({
-	            		label: 'End',
-	            		type: a.type,
-	            		activityId: a.id
-	            	}));
-	            }
-	            else if (a.type === 'task') {
+	            if (a.type === 'task') {
 	            	$('#taskObjects').append(_menuNode({
 	            		label: a.name,
 	            		type: a.type,
@@ -144,7 +140,16 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 	 * load the workflow
 	 * 
 	 */
-	var loadWorkflow = function(id, editing, version) {
+	var loadWorkflow = function(id, editing, version, iconSize, gridSize) {
+		
+		
+		// initialize variables
+		$g.attributes = [];
+		$g.steps      = {};
+		$g.diagram.reset();
+		$g.iconSize = iconSize || $g.iconSize;
+		$g.gridSize = !isNaN(gridSize) ? gridSize : $g.gridSize;
+		
 		
 		$g.loadingModal.dialog('open');
 		
@@ -152,6 +157,8 @@ define(['jquery', 'wf-global', 'wf-ui', 'wf-item', 'wf-canvas', 'wf-util'], func
 		version = '?version=' + version;
 		version = (editing === false) ? version : '?version=0';
 		
+		$g.id      = id;
+		$g.version = version;
 		$g.editing = (editing === true) ? true : false;
 		
 	    // get the workflow
