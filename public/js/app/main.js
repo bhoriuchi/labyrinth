@@ -39,7 +39,9 @@ define(
 	$(document).ready(function() {
 		
 		// create a socket.io connection
-		$g.socket   = io.connect('http://localhost:8080');
+		$g.socket   = io.connect('http://localhost:8080', {
+			reconnection: false
+		});
 
 		$g.socket.on('connect', function() {
 			console.log('Connected to socket.io');
