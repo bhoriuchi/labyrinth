@@ -6,6 +6,7 @@
 define(['jquery', 'jsplumb'], function($, jsPlumb) {
 	
 	return {
+		message:        'workflow_message',
 		socket:         null,
 		id:             null,
 		version:        null,

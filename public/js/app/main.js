@@ -39,20 +39,36 @@ define(
 	$(document).ready(function() {
 		
 		// create a socket.io connection
-		$g.socket   = io.connect('http://localhost:8080', {
-			reconnection: false
-		});
+		$g.socket   = io.connect('http://localhost:8080');
 
-		$g.socket.on('connection', function(msg) {
-			
-			console.log('socket.io is', msg);
+		$g.socket.on('connect', function() {
+			console.log('Connected to socket.io');
+		});
+		$g.socket.on('connect_error', function(err) {
+			console.log('Error connecting to socket.io', err);
 		});
 		
-		$g.socket.on('log', function(msg) {
-			
-			console.log('log message sent', msg);
+		$g.socket.on($g.message, function(msg) {
+			if (msg.type === 'start') {
+				console.log('START: Started Workflow Run', msg.id);
+			}
+			else if (msg.type === 'step_start') {
+				console.log('STEP: Started Step', msg);
+			}
+			else if (msg.type === 'step_end') {
+				console.log('STEP: Ended Step', msg);
+			}		
+			else if (msg.type === 'log') {
+				console.log('LOG:', msg.data);
+			}
+			else if (msg.type === 'end') {
+				console.log('END: Ended Workflow Run', msg);
+				$g.socket.emit($g.message, {
+					type: 'leave',
+					id: msg.id
+				});
+			}
 		});
-		
 		
 		// get the id
 		var id      = $util.getURLParameter('id');

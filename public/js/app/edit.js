@@ -76,7 +76,10 @@ define(['jquery', 'wf-global', 'wf-util', 'wf-canvas'], function($, $g, $util, $
 	        data: JSON.stringify(body)
 	    })
 	    .done(function(run, status, xhr) {
-	    	console.log(run, status, xhr);
+	    	$g.socket.emit($g.message, {
+	    		type: 'join',
+	    		id: run.id
+	    	});
 	    })
         .fail(function(xhr, status, err) {
         	$util.errorDialog('Failed', 'Failed to run the workflow');
